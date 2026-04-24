@@ -1,0 +1,30 @@
+name: Validate
+
+# Catches drift between the committed test vectors and what a spec-compliant
+# implementation produces. Runs on every push + PR.
+#
+# For each vector in test-vectors/, re-canonicalize the poll/ballot/reveal
+# with sig.value emptied, recompute SHA-256, and assert it matches the
+# vector's expected_*_id. This is the protocol's own conformance gate;
+# separately, @orangecheck/vote-core runs the same fixtures as vitest
+# conformance in oc-packages/vote-core/src/test-vectors.test.ts.
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+jobs:
+    vectors:
+        name: Re-derive ids from canonical bytes
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: '20'
+
+            - name: Validate every test vector
+              run: node scripts/validate-vectors.mjs
