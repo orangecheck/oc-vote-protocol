@@ -4,6 +4,11 @@ All notable changes to the OC Vote protocol and reference SDK.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased] — 2026-04
+
+### Added
+- **`SPEC-v0.1-draft.md`** — design draft for threshold reveal (drand tlock + n-of-m trustee Shamir) and single-poll delegation attestation. Non-normative; `SPEC.md` v0 remains the canonical spec. Proposes new Nostr kinds 30083 (trustee share) + 30084 (delegation attestation), a scheme-aware `reveal` field in the poll object, and planned test vectors v06–v10. Comments welcome at `security@ochk.io` prefix `[protocol-v0.1]`.
+
 ## [0.1.0] — 2026-04
 
 Initial public specification of OC Vote v0.
