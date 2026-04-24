@@ -1,0 +1,86 @@
+{
+  "description": "single-voter public poll, sats-weighted, minimal fields",
+  "inputs": {
+    "poll": {
+      "v": 0,
+      "kind": "oc-vote/poll",
+      "creator": "bc1qalice",
+      "question": "Do we ship?",
+      "options": [
+        {
+          "id": "yes",
+          "label": "Ship it"
+        },
+        {
+          "id": "no",
+          "label": "Hold"
+        }
+      ],
+      "deadline": "2026-05-08T00:00:00Z",
+      "snapshot_block": 900000,
+      "weight_mode": "sats",
+      "weight_params": null,
+      "min_sats": 100000,
+      "min_days": 30,
+      "mode": "public",
+      "reveal_pk": null,
+      "tiebreak": "latest",
+      "notes": null,
+      "created_at": "2026-04-22T12:00:00Z",
+      "sig": {
+        "alg": "bip322",
+        "pubkey": "bc1qalice",
+        "value": "QUxJQ0Utc2lnbmF0dXJlLWZha2UtZm9yLXRlc3QtdmVjdG9y"
+      }
+    },
+    "ballots": [
+      {
+        "v": 0,
+        "kind": "oc-vote/ballot",
+        "poll_id": "3054390f047f2703186943a41178bc15931500b5139229517f26e56282026ee5",
+        "voter": "bc1qbob",
+        "option": "yes",
+        "attestation_id": null,
+        "secret": null,
+        "created_at": "2026-04-23T09:15:00Z",
+        "sig": {
+          "alg": "bip322",
+          "pubkey": "bc1qbob",
+          "value": "Qk9CLXNpZ25hdHVyZS1mYWtlLWZvci10ZXN0LXZlY3Rvcg=="
+        }
+      }
+    ]
+  },
+  "expected": {
+    "poll_id": "3054390f047f2703186943a41178bc15931500b5139229517f26e56282026ee5",
+    "poll_canonical": "{\"created_at\":\"2026-04-22T12:00:00Z\",\"creator\":\"bc1qalice\",\"deadline\":\"2026-05-08T00:00:00Z\",\"kind\":\"oc-vote/poll\",\"min_days\":30,\"min_sats\":100000,\"mode\":\"public\",\"notes\":null,\"options\":[{\"id\":\"yes\",\"label\":\"Ship it\"},{\"id\":\"no\",\"label\":\"Hold\"}],\"question\":\"Do we ship?\",\"reveal_pk\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qalice\",\"value\":\"\"},\"snapshot_block\":900000,\"tiebreak\":\"latest\",\"v\":0,\"weight_mode\":\"sats\",\"weight_params\":null}\n",
+    "ballot_ids": [
+      "6b3b1587d0ee26171392f13426e1fd97cc72ba0b9a5faeba8218a803dd6c14cd"
+    ],
+    "ballot_canonicals": [
+      "{\"attestation_id\":null,\"created_at\":\"2026-04-23T09:15:00Z\",\"kind\":\"oc-vote/ballot\",\"option\":\"yes\",\"poll_id\":\"3054390f047f2703186943a41178bc15931500b5139229517f26e56282026ee5\",\"secret\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qbob\",\"value\":\"\"},\"v\":0,\"voter\":\"bc1qbob\"}\n"
+    ],
+    "tally_with_utxos": {
+      "utxo_snapshot": {
+        "bc1qbob": [
+          {
+            "value": 250000,
+            "confirmed_height": 895000
+          }
+        ]
+      },
+      "expected_result": {
+        "state": "tallied",
+        "snapshot_block": 900000,
+        "turnout": {
+          "voters": 1,
+          "weight": 250000
+        },
+        "tallies": {
+          "yes": 250000,
+          "no": 0
+        }
+      }
+    }
+  }
+}

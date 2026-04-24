@@ -1,0 +1,103 @@
+{
+  "description": "same voter casts two ballots; tiebreak=latest selects the later one",
+  "inputs": {
+    "poll": {
+      "v": 0,
+      "kind": "oc-vote/poll",
+      "creator": "bc1qalice",
+      "question": "Change your mind?",
+      "options": [
+        {
+          "id": "a",
+          "label": "A"
+        },
+        {
+          "id": "b",
+          "label": "B"
+        }
+      ],
+      "deadline": "2026-05-08T00:00:00Z",
+      "snapshot_block": 900000,
+      "weight_mode": "one_per_address",
+      "weight_params": null,
+      "min_sats": 10000,
+      "min_days": 0,
+      "mode": "public",
+      "reveal_pk": null,
+      "tiebreak": "latest",
+      "notes": null,
+      "created_at": "2026-04-22T12:00:00Z",
+      "sig": {
+        "alg": "bip322",
+        "pubkey": "bc1qalice",
+        "value": "QUxJQ0Utc2lnbmF0dXJlLWZha2UtZm9yLXRlc3QtdmVjdG9y"
+      }
+    },
+    "ballots": [
+      {
+        "v": 0,
+        "kind": "oc-vote/ballot",
+        "poll_id": "8e92e84a85ba94632da48aa742352de6dba14ac977898db86303cc6ff11a235d",
+        "voter": "bc1qbob",
+        "option": "a",
+        "attestation_id": null,
+        "secret": null,
+        "created_at": "2026-04-23T09:00:00Z",
+        "sig": {
+          "alg": "bip322",
+          "pubkey": "bc1qbob",
+          "value": "Qk9CLXNpZ25hdHVyZS1mYWtlLWZvci10ZXN0LXZlY3Rvcg=="
+        }
+      },
+      {
+        "v": 0,
+        "kind": "oc-vote/ballot",
+        "poll_id": "8e92e84a85ba94632da48aa742352de6dba14ac977898db86303cc6ff11a235d",
+        "voter": "bc1qbob",
+        "option": "b",
+        "attestation_id": null,
+        "secret": null,
+        "created_at": "2026-04-24T09:00:00Z",
+        "sig": {
+          "alg": "bip322",
+          "pubkey": "bc1qbob",
+          "value": "Qk9CLXNpZ25hdHVyZS1mYWtlLWZvci10ZXN0LXZlY3Rvcg=="
+        }
+      }
+    ]
+  },
+  "expected": {
+    "poll_id": "8e92e84a85ba94632da48aa742352de6dba14ac977898db86303cc6ff11a235d",
+    "poll_canonical": "{\"created_at\":\"2026-04-22T12:00:00Z\",\"creator\":\"bc1qalice\",\"deadline\":\"2026-05-08T00:00:00Z\",\"kind\":\"oc-vote/poll\",\"min_days\":0,\"min_sats\":10000,\"mode\":\"public\",\"notes\":null,\"options\":[{\"id\":\"a\",\"label\":\"A\"},{\"id\":\"b\",\"label\":\"B\"}],\"question\":\"Change your mind?\",\"reveal_pk\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qalice\",\"value\":\"\"},\"snapshot_block\":900000,\"tiebreak\":\"latest\",\"v\":0,\"weight_mode\":\"one_per_address\",\"weight_params\":null}\n",
+    "ballot_ids": [
+      "ad5402c5786d155c79a6c9635a87c0d8d82afe837af08d24c0e5e998d2826ab6",
+      "d51c04454b6bfe84d081039b9b40134ed901930872cbf1c204d255e3b765449f"
+    ],
+    "ballot_canonicals": [
+      "{\"attestation_id\":null,\"created_at\":\"2026-04-23T09:00:00Z\",\"kind\":\"oc-vote/ballot\",\"option\":\"a\",\"poll_id\":\"8e92e84a85ba94632da48aa742352de6dba14ac977898db86303cc6ff11a235d\",\"secret\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qbob\",\"value\":\"\"},\"v\":0,\"voter\":\"bc1qbob\"}\n",
+      "{\"attestation_id\":null,\"created_at\":\"2026-04-24T09:00:00Z\",\"kind\":\"oc-vote/ballot\",\"option\":\"b\",\"poll_id\":\"8e92e84a85ba94632da48aa742352de6dba14ac977898db86303cc6ff11a235d\",\"secret\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qbob\",\"value\":\"\"},\"v\":0,\"voter\":\"bc1qbob\"}\n"
+    ],
+    "tally_with_utxos": {
+      "utxo_snapshot": {
+        "bc1qbob": [
+          {
+            "value": 50000,
+            "confirmed_height": 895000
+          }
+        ]
+      },
+      "expected_result": {
+        "state": "tallied",
+        "snapshot_block": 900000,
+        "turnout": {
+          "voters": 1,
+          "weight": 1
+        },
+        "tallies": {
+          "a": 0,
+          "b": 1
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "description": "sats_days weighting with 180-day cap; one voter with two UTXOs, one beyond the cap",
+  "inputs": {
+    "poll": {
+      "v": 0,
+      "kind": "oc-vote/poll",
+      "creator": "bc1qalice",
+      "question": "Hard fork Y/N?",
+      "options": [
+        {
+          "id": "yes",
+          "label": "Fork"
+        },
+        {
+          "id": "no",
+          "label": "Hold"
+        }
+      ],
+      "deadline": "2026-05-08T00:00:00Z",
+      "snapshot_block": 900000,
+      "weight_mode": "sats_days",
+      "weight_params": {
+        "cap_days": 180
+      },
+      "min_sats": 100000,
+      "min_days": 30,
+      "mode": "public",
+      "reveal_pk": null,
+      "tiebreak": "latest",
+      "notes": null,
+      "created_at": "2026-04-22T12:00:00Z",
+      "sig": {
+        "alg": "bip322",
+        "pubkey": "bc1qalice",
+        "value": "QUxJQ0Utc2lnbmF0dXJlLWZha2UtZm9yLXRlc3QtdmVjdG9y"
+      }
+    },
+    "ballots": [
+      {
+        "v": 0,
+        "kind": "oc-vote/ballot",
+        "poll_id": "571e3615db08c95c7f19d464e1db2b58c6c885417b4ab8bd0d523e2ad8a44ec9",
+        "voter": "bc1qbob",
+        "option": "yes",
+        "attestation_id": null,
+        "secret": null,
+        "created_at": "2026-04-23T09:15:00Z",
+        "sig": {
+          "alg": "bip322",
+          "pubkey": "bc1qbob",
+          "value": "Qk9CLXNpZ25hdHVyZS1mYWtlLWZvci10ZXN0LXZlY3Rvcg=="
+        }
+      }
+    ]
+  },
+  "expected": {
+    "poll_id": "571e3615db08c95c7f19d464e1db2b58c6c885417b4ab8bd0d523e2ad8a44ec9",
+    "poll_canonical": "{\"created_at\":\"2026-04-22T12:00:00Z\",\"creator\":\"bc1qalice\",\"deadline\":\"2026-05-08T00:00:00Z\",\"kind\":\"oc-vote/poll\",\"min_days\":30,\"min_sats\":100000,\"mode\":\"public\",\"notes\":null,\"options\":[{\"id\":\"yes\",\"label\":\"Fork\"},{\"id\":\"no\",\"label\":\"Hold\"}],\"question\":\"Hard fork Y/N?\",\"reveal_pk\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qalice\",\"value\":\"\"},\"snapshot_block\":900000,\"tiebreak\":\"latest\",\"v\":0,\"weight_mode\":\"sats_days\",\"weight_params\":{\"cap_days\":180}}\n",
+    "ballot_ids": [
+      "b61e2b305a4dfb94bcc528bdfcb5a076b7f7f88d3fcb28a2fad11afa0df8f3aa"
+    ],
+    "ballot_canonicals": [
+      "{\"attestation_id\":null,\"created_at\":\"2026-04-23T09:15:00Z\",\"kind\":\"oc-vote/ballot\",\"option\":\"yes\",\"poll_id\":\"571e3615db08c95c7f19d464e1db2b58c6c885417b4ab8bd0d523e2ad8a44ec9\",\"secret\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qbob\",\"value\":\"\"},\"v\":0,\"voter\":\"bc1qbob\"}\n"
+    ],
+    "tally_with_utxos": {
+      "utxo_snapshot": {
+        "bc1qbob": [
+          {
+            "value": 200000,
+            "confirmed_height": 892800
+          },
+          {
+            "value": 300000,
+            "confirmed_height": 842400
+          }
+        ]
+      },
+      "expected_result": {
+        "state": "tallied",
+        "snapshot_block": 900000,
+        "turnout": {
+          "voters": 1,
+          "weight": 64000000
+        },
+        "tallies": {
+          "yes": 64000000,
+          "no": 0
+        }
+      }
+    }
+  }
+}
