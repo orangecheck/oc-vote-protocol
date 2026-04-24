@@ -507,7 +507,7 @@ A client is OC Vote v0 compliant if and only if:
 
 ## 16. Acknowledgements
 
-OC Vote stands on the design rules established by [OrangeCheck](https://github.com/orangecheck/oc-web/blob/main/docs/oc-protocol/VISION.md) and the encoding conventions of [OC Lock](https://github.com/orangecheck/oc-lock-protocol/blob/main/SPEC.md). The framing of Bitcoin weight as the load-bearing sybil filter comes from [Bram Kanstein](https://bramk.substack.com/)'s work on Bitcoin as a sovereignty substrate. See [`WHY.md`](./WHY.md) for the design rationale.
+OC Vote stands on the design rules established by [OrangeCheck](https://github.com/orangecheck/oc-web/blob/main/docs/oc-protocol/VISION.md) and the encoding conventions of [OC Lock](https://github.com/orangecheck/oc-lock-protocol/blob/main/SPEC.md). The framing of Bitcoin weight as the load-bearing sybil filter extends the OrangeCheck family's view of Bitcoin as a sovereignty substrate. See [`WHY.md`](./WHY.md) for the design rationale.
 
 ---
 

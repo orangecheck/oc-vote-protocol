@@ -128,7 +128,7 @@ That's the whole protocol. Everything else is encoding details. See [`WHY.md`](.
 
 ## Acknowledgements
 
-The reframing of Bitcoin as a civilizational primitive — not payments, but identity, confidentiality, and now legitimacy — owes its intellectual provenance to [**Bram Kanstein**](https://bramk.substack.com/). The specific thesis that *weight* is the load-bearing property of Bitcoin for governance (distinct from *identity*, which OrangeCheck handles, and *access*, which v1 of the LOCK protocol chased and retired) is a direct extension of that work. The Ed25519-substitution test that gate-keeps feature inclusion is inherited verbatim from OrangeCheck's `VISION.md`.
+OC Vote reframes Bitcoin as a civilizational primitive — not payments, but identity, confidentiality, and now legitimacy. The specific thesis that *weight* is the load-bearing property of Bitcoin for governance (distinct from *identity*, which OrangeCheck handles, and *access*, which v1 of the LOCK protocol chased and retired) is a direct extension of that framing. The Ed25519-substitution test that gate-keeps feature inclusion is inherited verbatim from OrangeCheck's `VISION.md`.
 
 See also [OrangeCheck](https://ochk.io) and [OC Lock](https://github.com/orangecheck/oc-lock-protocol), the two primitives OC Vote composes on top of.
 

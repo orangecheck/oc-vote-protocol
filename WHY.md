@@ -297,7 +297,7 @@ OC Vote trades receipt-freeness for bootstrap-freeness. A community running a no
 
 ## Acknowledgements
 
-OC Vote inherits the "Bitcoin as a civilizational primitive" framing that shapes OrangeCheck and OC Lock, which in turn came out of conversations with [**Bram Kanstein**](https://bramk.substack.com/). The specific idea that *weight* (not identity, not payment) is the load-bearing property of Bitcoin for governance is a direct extension of his work on Bitcoin as a sovereignty layer. The design choice to refuse any feature that would work on Ed25519 is inherited verbatim from OrangeCheck's VISION.md.
+OC Vote inherits the "Bitcoin as a civilizational primitive" framing that shapes OrangeCheck and OC Lock. The specific idea that *weight* (not identity, not payment) is the load-bearing property of Bitcoin for governance is a direct extension of that framing — Bitcoin as a sovereignty layer, not a payment rail. The design choice to refuse any feature that would work on Ed25519 is inherited verbatim from OrangeCheck's VISION.md.
 
 The threshold-reveal future-work direction draws on [drand](https://drand.love)'s League of Entropy and the [tlock](https://drand.love/docs/timelock-encryption/) scheme.
 
