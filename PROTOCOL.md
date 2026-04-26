@@ -252,4 +252,4 @@ NIP-88 polls are one-per-pubkey, no weighting, no sybil resistance. Free to spin
 - Read [`WHY.md`](./WHY.md) for the hypothesis-by-hypothesis design rationale.
 - Read [`SECURITY.md`](./SECURITY.md) for the threat model.
 - See [`test-vectors/`](./test-vectors/) for conformance fixtures.
-- Try the web client once it ships: [`orangecheck/oc-vote-web`](https://github.com/orangecheck/oc-vote-web).
+- Try the hosted web client at [vote.ochk.io](https://vote.ochk.io).

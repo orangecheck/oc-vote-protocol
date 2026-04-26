@@ -42,7 +42,7 @@ npm i @orangecheck/vote-core
 
 ## Reference web client
 
-A live implementation of OC Vote v0 will run at **[vote.ochk.io](https://vote.ochk.io)**. Source: [`orangecheck/oc-vote-web`](https://github.com/orangecheck/oc-vote-web).
+A live reference implementation of OC Vote v0 runs at **[vote.ochk.io](https://vote.ochk.io)** (closed-source web client; the underlying protocol implementation is published as [`@orangecheck/vote-*`](https://www.npmjs.com/org/orangecheck) on npm).
 
 ## How it works in one paragraph
 
@@ -101,7 +101,7 @@ That's the whole protocol. Everything else is encoding details. See [`WHY.md`](.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  oc-vote-web              create UI, vote UI, tally UI          │
+│  vote.ochk.io             create UI, vote UI, tally UI          │
 ├─────────────────────────────────────────────────────────────────┤
 │  @orangecheck/vote-core         canonicalization, tally()       │
 │  @orangecheck/vote-ballot       sign, seal (secret mode)        │
@@ -118,9 +118,10 @@ That's the whole protocol. Everything else is encoding details. See [`WHY.md`](.
 ## Related repositories
 
 - [`orangecheck/oc-packages`](https://github.com/orangecheck/oc-packages) — `@orangecheck/vote-*` packages live here alongside the rest of the OrangeCheck SDK.
-- [`orangecheck/oc-vote-web`](https://github.com/orangecheck/oc-vote-web) — reference web client at [vote.ochk.io](https://vote.ochk.io).
+- [vote.ochk.io](https://vote.ochk.io) — hosted reference web client (closed-source).
 - [`orangecheck/oc-lock-protocol`](https://github.com/orangecheck/oc-lock-protocol) — the encryption primitive OC Vote uses for secret-mode ballots.
-- [`orangecheck/oc-web`](https://github.com/orangecheck/oc-web) — the OrangeCheck site and protocol spec.
+- [`orangecheck/oc-vote-examples`](https://github.com/orangecheck/oc-vote-examples) — copy-forkable integration templates (Discord bot, GitHub Action, shell recipes).
+- [ochk.io](https://ochk.io) — the OrangeCheck umbrella site.
 
 ## Status
 

@@ -13,7 +13,7 @@ We aim to acknowledge within 48 hours and publish a fix for high/critical issues
 
 ## Scope
 
-This document covers the **OC Vote v0 protocol specification** in this repository. The reference TypeScript implementation lives in [`orangecheck/oc-packages`](https://github.com/orangecheck/oc-packages); the web client lives in [`orangecheck/oc-vote-web`](https://github.com/orangecheck/oc-vote-web). Each of those has its own `SECURITY.md`.
+This document covers the **OC Vote v0 protocol specification** in this repository. The reference TypeScript implementation lives in [`orangecheck/oc-packages`](https://github.com/orangecheck/oc-packages) and has its own `SECURITY.md`. The hosted reference web client at [vote.ochk.io](https://vote.ochk.io) is closed-source; report web-client security issues via `security@ochk.io`.
 
 ## Threat model
 
