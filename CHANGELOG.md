@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased] — 2026-04
 
 ### Added
+- **`LIFECYCLE.md`** — normative companion document specifying per-kind lifecycles for poll (30080), ballot (30081), and reveal (30082). Polls are non-revocable post-publication (orphans ballot consumers); ballots are replaceable per `(poll, voter)` per existing §5.2 with `tiebreak`-governed precedence; reveals are one-shot — the secret cannot be unpublished. Bond / weight withdrawal works via UTXO spend before `snapshot_block`. Dashboard-local hide flags and NIP-09 deletion-request events have no protocol force. No protocol changes; clarification only.
 - **`SPEC-v0.1-draft.md`** — design draft for threshold reveal (drand tlock + n-of-m trustee Shamir) and single-poll delegation attestation. Non-normative; `SPEC.md` v0 remains the canonical spec. Proposes new Nostr kinds 30083 (trustee share) + 30084 (delegation attestation), a scheme-aware `reveal` field in the poll object, and planned test vectors v06–v10. Comments welcome at `security@ochk.io` prefix `[protocol-v0.1]`.
 
 ## [0.1.0] — 2026-04

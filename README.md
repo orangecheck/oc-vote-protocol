@@ -21,6 +21,7 @@ This repository is the **normative protocol specification**. No code lives here 
 | [`PROTOCOL.md`](./PROTOCOL.md) | Narrative walkthrough with five flows: public weighted poll, one-per-address with threshold, secret ballot, multi-address voter, and dispute resolution. |
 | [`WHY.md`](./WHY.md) | The design rationale — every load-bearing hypothesis stress-tested against alternatives, plus the explicit list of things v0 does NOT solve. |
 | [`SECURITY.md`](./SECURITY.md) | Threat model, 14 attack scenarios and their status, report channel. |
+| [`LIFECYCLE.md`](./LIFECYCLE.md) | Normative lifecycle stance per kind — poll (non-revocable), ballot (replaceable per `(poll, voter)`), reveal (one-shot). |
 | [`CHANGELOG.md`](./CHANGELOG.md) | Version history. |
 | [`test-vectors/`](./test-vectors/) | Cross-implementation conformance fixtures. |
 
