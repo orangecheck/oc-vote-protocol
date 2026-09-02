@@ -4,6 +4,44 @@ All notable changes to the OC Vote protocol and reference SDK.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased] — 2026-09-02 — errata: ballots were undiscoverable
+
+**Errata. No envelope, canonicalization, signature or tally-algorithm changes
+— every existing test vector keeps its verdict.** The Nostr tag section
+specified only multi-letter tags, which relays do not index, so the one query
+a tally depends on could never match.
+
+### Fixes
+
+- **§3.4 / §3.6 / §6.3 event tags.** Poll, ballot and reveal events now
+  normatively carry indexed `t` tags (`poll_id`, a family marker, and the
+  creator/voter address) alongside the existing multi-letter tags. The
+  multi-letter tags are readable diagnostics; a verifier MUST NOT depend on
+  them.
+- **New §6.5, "Discovering the ballots in a poll."** States the constraint
+  (relays index single-letter names only; tag filters are exact-match, so a
+  ballot's `oc-vote:ballot:<poll_id>:<voter>` d-tag cannot enumerate voters),
+  gives the three working `#t` queries, and requires the tallier to confirm
+  `content.poll_id` and de-duplicate by `ballot_id` because `t` is a shared
+  namespace on these events.
+- **§6.3** promised that "observers MAY still enumerate the ballots" while the
+  wire format made enumeration impossible. It now points at §6.5.
+
+### Impact before the fix
+
+`@orangecheck/vote-cli`'s `fetchBallotEvents` and `vote.ochk.io/api/tally`
+both filtered `#poll_id` — as specified — and returned zero ballots for every
+poll. `vote.ochk.io` had already fixed the *emission* half (its ballots do
+carry `['t', poll_id]`) but not the read half, so it was publishing findable
+ballots and then failing to find them.
+
+### Migration
+
+**None.** A sweep of `relay.ochk.io`, `relay.damus.io`, `nos.lol`,
+`relay.snort.social` and `relay.primal.net` on 2026-09-02 found zero
+kind-3008x events carrying an `oc-vote:` `d`-tag prefix.
+
+
 ## [Unreleased] — 2026-04
 
 ### Added

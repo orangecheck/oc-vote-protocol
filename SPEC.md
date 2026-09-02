@@ -104,6 +104,9 @@ A poll is published as an **addressable** event of kind `30080`:
 event.kind       = 30080
 event.tags       = [
   ["d",          "oc-vote:poll:" || poll_id],
+  ["t",          poll_id],
+  ["t",          "oc-vote-poll"],
+  ["t",          creator],
   ["poll_id",    poll_id],
   ["creator",    creator],
   ["deadline",   deadline],
@@ -190,6 +193,9 @@ A ballot is published as an addressable event of kind `30081`, replaceable per (
 event.kind       = 30081
 event.tags       = [
   ["d",          "oc-vote:ballot:" || poll_id || ":" || voter],
+  ["t",          poll_id],
+  ["t",          "oc-vote-ballot"],
+  ["t",          voter],
   ["poll_id",    poll_id],
   ["voter",      voter],
   ["ballot_id",  ballot_id]
@@ -308,6 +314,8 @@ reveal_id := SHA256(canonical_bytes(reveal_with_sig.value_set_to_""))
 event.kind    = 30082
 event.tags    = [
   ["d",       "oc-vote:reveal:" || poll_id],
+  ["t",       poll_id],
+  ["t",       "oc-vote-reveal"],
   ["poll_id", poll_id]
 ]
 event.content = canonical_bytes(reveal_object)
@@ -324,7 +332,39 @@ Given a secret-mode ballot and the reveal_sk, the tallier:
 
 ### 6.5 Abandoned polls
 
-If no valid reveal event exists for a secret-mode poll at tally time, the poll is **abandoned**. Clients MUST display the state as "awaiting reveal" and MUST NOT produce a tally. Observers MAY still enumerate the ballots, which proves participation even if the choices are opaque.
+If no valid reveal event exists for a secret-mode poll at tally time, the poll is **abandoned**. Clients MUST display the state as "awaiting reveal" and MUST NOT produce a tally. Observers MAY still enumerate the ballots (§6.5), which proves participation even if the choices are opaque.
+
+### 6.5 Discovering the ballots in a poll
+
+Relays index **single-letter** tag names only (NIP-12), and tag filters are
+exact-match — NIP-01 defines no prefix operator. A ballot's `d`-tag is
+`oc-vote:ballot:<poll_id>:<voter>`, so `#d` can only fetch a ballot whose
+voter you already know, and enumerating the voters is precisely what a tally
+needs. The indexed `t` tag is therefore the only route:
+
+```
+REQ { "kinds": [30081], "#t": ["<poll_id 64-hex>"] }     // every ballot in the poll
+REQ { "kinds": [30080], "#t": ["<poll_id 64-hex>"] }     // the poll
+REQ { "kinds": [30082], "#t": ["<poll_id 64-hex>"] }     // the reveal
+```
+
+Because `t` is a shared namespace on these events — poll id, family marker,
+and voter or creator address all use it — a tallier MUST confirm each matched
+event against its content and MUST NOT trust the tag alone: accept a ballot
+only if `content.poll_id` equals the poll being tallied, and de-duplicate by
+`ballot_id` (kind 30081 is replaceable per `(poll, voter)`, but a
+non-conforming relay may still return more than one).
+
+> **Errata (2026-09-02).** §3.4 / §3.6 / §6.3 previously specified only the
+> multi-letter `poll_id` / `voter` / `creator` tags. A `#poll_id` filter
+> matches nothing on a conforming relay, so ballot enumeration — and with it
+> every tally — was impossible as specified, while §6.3 asserted that
+> observers MAY enumerate ballots. `@orangecheck/vote-cli` and
+> `vote.ochk.io/api/tally` both implemented the specified filter and returned
+> zero ballots for every poll. The multi-letter tags are retained for
+> readability; a verifier MUST NOT depend on them. No migration is required:
+> a sweep of five relays on 2026-09-02 found zero kind-3008x events carrying
+> an `oc-vote:` `d`-tag prefix.
 
 ## 7. Canonicalization
 
