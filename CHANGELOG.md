@@ -4,6 +4,22 @@ All notable changes to the OC Vote protocol and reference SDK.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased] — 2026-09-24 — §8 tally clarifications
+
+**Clarification. No envelope, canonicalization or signature changes — every
+existing test vector keeps its verdict.** The §8 pseudo-code now states rules
+that §3.3, §4.3 and §10.1 already required.
+
+- Step 1 verifies the poll's `sig` against `creator` (§10.1) and drops
+  ballots whose `voter` is not a mainnet address (§4.3).
+- Step 3 unseals each voter's de-duplicated ballot only, and drops a revealed
+  option that is not one of `poll.options` or `withdraw` (`E_UNKNOWN_OPTION`).
+- New text after §8: option ids are plain strings, never inherited object
+  properties; and when relays return several poll or reveal events for one
+  `d` tag, selection is by content hash and signature, not recency.
+
+Reference implementation: `@orangecheck/vote-core` 1.3.0.
+
 ## [Unreleased] — 2026-09-02 — errata: ballots were undiscoverable
 
 **Errata. No envelope, canonicalization, signature or tally-algorithm changes

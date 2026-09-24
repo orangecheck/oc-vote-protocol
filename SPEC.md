@@ -408,9 +408,12 @@ age_days(u, H) := max(0, floor((H - u.confirmed_height) * 600 / 86400))
 ```
 function tally(poll, ballots[], utxos_at: (addr, H) -> UTXOSet, reveal_sk: optional):
   # 1. Drop unsignable / untrusted ballots
+  if not verify_bip322(poll.creator, poll_id(poll), poll.sig.value):
+    reject(E_BAD_SIG)             # §10.1
   valid = []
   for b in ballots:
     if b.poll_id != poll.poll_id: continue
+    if not is_mainnet(b.voter): continue      # §4.3
     if b.created_at > poll.deadline: continue
     if not verify_bip322(b.voter, ballot_id(b), b.sig.value): continue
     if poll.mode == "secret":
@@ -433,12 +436,14 @@ function tally(poll, ballots[], utxos_at: (addr, H) -> UTXOSet, reveal_sk: optio
   if poll.mode == "secret":
     if reveal_sk is None:
       return { "state": "awaiting_reveal" }
-    for voter, b in per_voter:
+    for voter, b in per_voter:     # the de-duplicated ballot, never another
       try:
         option = unseal_and_verify_commit(b.secret, reveal_sk, voter, poll.poll_id)
+        if option != "withdraw" and option not in [o.id for o in poll.options]:
+          raise E_UNKNOWN_OPTION
         b.option = option
       except:
-        del per_voter[voter]   # E_COMMIT_MISMATCH
+        del per_voter[voter]   # E_COMMIT_MISMATCH / E_UNKNOWN_OPTION
 
   # 4. Compute snapshot block
   H = resolve_snapshot(poll.snapshot_block, poll.deadline)
@@ -463,6 +468,20 @@ function tally(poll, ballots[], utxos_at: (addr, H) -> UTXOSet, reveal_sk: optio
     "tallies": tallies
   }
 ```
+
+The plaintext for a voter MUST come from unsealing that voter's entry in
+`per_voter` — the ballot that passed step 1 and won step 2. A tallier MUST
+NOT unseal ballots before steps 1–2 and look the result up by voter, because
+a ballot that fails step 1 can name the same voter. Option ids are compared
+as plain strings; an implementation MUST NOT let an option id resolve to an
+inherited property of a map or object (for example `__proto__` or
+`constructor`).
+
+When a relay returns several kind-30080 or kind-30082 events for one `d`
+tag, the poll is an event whose content hashes to the requested `poll_id`
+and whose `sig` verifies (§10.1), and the reveal is one that satisfies §6.4
+and §10.3. Event recency is not a selection rule: anyone can publish under
+any `d` tag with any `created_at`.
 
 `choose_by_tiebreak(a, b, t)`:
 - If `t == "latest"`: pick the ballot with greater `created_at`. On ties, pick greater `ballot_id` lexicographically.
