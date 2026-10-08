@@ -4,6 +4,10 @@ All notable changes to the OC Vote protocol and reference SDK.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased] — 2026-10-08 — reference relay set
+
+- **§3.4** names the five relays the reference client actually uses. It listed `relay.damus.io`, which the shared default set has never included. Non-normative; nothing a client MUST do changes.
+
 ## [Unreleased] — 2026-09-24 — §8 tally clarifications
 
 **Clarification. No envelope, canonicalization or signature changes — every
