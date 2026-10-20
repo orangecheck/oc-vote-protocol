@@ -9,7 +9,7 @@ Email **security@ochk.io** with:
 - Your assessment of impact: what can an attacker do, under what assumptions?
 - Whether you want credit when we publish the fix.
 
-We aim to acknowledge within 48 hours and publish a fix for high/critical issues within 14 days. Do not file public GitHub issues for suspected vulnerabilities.
+We aim to reply to every report within 30 days. We can't promise a time to a fix yet. Do not file public GitHub issues for suspected vulnerabilities.
 
 ## Scope
 

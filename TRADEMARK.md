@@ -4,10 +4,10 @@
 `OC Attest™`, `OC Lock™`, `OC Vote™`, `OC Stamp™`, `OC Agent™`, and
 `OC Pledge™` — are trademarks of the OrangeCheck project.
 
-The MIT License (covering source code in this repository) and the
-CC-BY-4.0 license (covering protocol specifications) grant you broad
-rights to use, copy, modify, and redistribute the licensed material.
-They do **not** grant you any rights to use the OrangeCheck trademarks.
+The MIT License (covering source code in this repository and the
+protocol specifications) grants you broad rights to use, copy, modify,
+and redistribute the licensed material. It does **not** grant you any
+rights to use the OrangeCheck trademarks.
 
 ## What you may do
 
@@ -57,5 +57,5 @@ _This policy applies to all repositories in the [OrangeCheck GitHub
 organization](https://github.com/orangecheck) and to all `*.ochk.io`
 properties. The canonical, authoritative version is published at
 <https://ochk.io/trademark>. This document is provided for clarity
-and does not enlarge or restrict any rights granted by the MIT or
-CC-BY-4.0 licenses, which govern code and prose respectively._
+and does not enlarge or restrict any rights granted by the MIT
+License, which governs both code and specifications._
