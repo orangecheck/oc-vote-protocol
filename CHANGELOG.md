@@ -4,6 +4,10 @@ All notable changes to the OC Vote protocol and reference SDK.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased] — 2026-10-21 — reference relay set
+
+- **§3.4** names the relays the reference client now uses. `relay.snort.social` and `offchain.pub` left it on 2026-10-21: snort kept none of the family events it accepted, and offchain refused events signed by fresh keys. `relay.damus.io` and `nostr.oxtr.dev` joined. Non-normative; nothing a client MUST do changes.
+
 ## [Unreleased] — 2026-10-21 — errata: relays keep every ballot; the tiebreak decides
 
 **Errata. No envelope, canonicalization, signature or tally-algorithm change —
