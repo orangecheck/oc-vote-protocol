@@ -1,0 +1,120 @@
+{
+  "description": "tiebreak=first with three ballots from one voter, two at the same earliest created_at, so the lesser ballot_id decides (option a). Relays keep all three, because each ballot is published under its own Nostr key (§4.5); the §8 tiebreak alone picks one.",
+  "inputs": {
+    "poll": {
+      "v": 0,
+      "kind": "oc-vote/poll",
+      "creator": "bc1qalice",
+      "question": "First answer counts?",
+      "options": [
+        {
+          "id": "a",
+          "label": "A"
+        },
+        {
+          "id": "b",
+          "label": "B"
+        }
+      ],
+      "deadline": "2026-05-08T00:00:00Z",
+      "snapshot_block": 900000,
+      "weight_mode": "one_per_address",
+      "weight_params": null,
+      "min_sats": 10000,
+      "min_days": 0,
+      "mode": "public",
+      "reveal_pk": null,
+      "tiebreak": "first",
+      "notes": null,
+      "created_at": "2026-04-22T12:00:00Z",
+      "sig": {
+        "alg": "bip322",
+        "pubkey": "bc1qalice",
+        "value": "QUxJQ0Utc2lnbmF0dXJlLWZha2UtZm9yLXRlc3QtdmVjdG9y"
+      }
+    },
+    "ballots": [
+      {
+        "v": 0,
+        "kind": "oc-vote/ballot",
+        "poll_id": "57f8363f2ad3f6ceebbb4c1339274fb875efa999f2971b54d394d5a12eebd6d7",
+        "voter": "bc1qbob",
+        "option": "b",
+        "attestation_id": null,
+        "secret": null,
+        "created_at": "2026-04-24T09:00:00Z",
+        "sig": {
+          "alg": "bip322",
+          "pubkey": "bc1qbob",
+          "value": "Qk9CLXNpZ25hdHVyZS1mYWtlLWZvci10ZXN0LXZlY3Rvcg=="
+        }
+      },
+      {
+        "v": 0,
+        "kind": "oc-vote/ballot",
+        "poll_id": "57f8363f2ad3f6ceebbb4c1339274fb875efa999f2971b54d394d5a12eebd6d7",
+        "voter": "bc1qbob",
+        "option": "b",
+        "attestation_id": null,
+        "secret": null,
+        "created_at": "2026-04-23T09:00:00Z",
+        "sig": {
+          "alg": "bip322",
+          "pubkey": "bc1qbob",
+          "value": "Qk9CLXNpZ25hdHVyZS1mYWtlLWZvci10ZXN0LXZlY3Rvcg=="
+        }
+      },
+      {
+        "v": 0,
+        "kind": "oc-vote/ballot",
+        "poll_id": "57f8363f2ad3f6ceebbb4c1339274fb875efa999f2971b54d394d5a12eebd6d7",
+        "voter": "bc1qbob",
+        "option": "a",
+        "attestation_id": null,
+        "secret": null,
+        "created_at": "2026-04-23T09:00:00Z",
+        "sig": {
+          "alg": "bip322",
+          "pubkey": "bc1qbob",
+          "value": "Qk9CLXNpZ25hdHVyZS1mYWtlLWZvci10ZXN0LXZlY3Rvcg=="
+        }
+      }
+    ]
+  },
+  "expected": {
+    "poll_id": "57f8363f2ad3f6ceebbb4c1339274fb875efa999f2971b54d394d5a12eebd6d7",
+    "poll_canonical": "{\"created_at\":\"2026-04-22T12:00:00Z\",\"creator\":\"bc1qalice\",\"deadline\":\"2026-05-08T00:00:00Z\",\"kind\":\"oc-vote/poll\",\"min_days\":0,\"min_sats\":10000,\"mode\":\"public\",\"notes\":null,\"options\":[{\"id\":\"a\",\"label\":\"A\"},{\"id\":\"b\",\"label\":\"B\"}],\"question\":\"First answer counts?\",\"reveal_pk\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qalice\",\"value\":\"\"},\"snapshot_block\":900000,\"tiebreak\":\"first\",\"v\":0,\"weight_mode\":\"one_per_address\",\"weight_params\":null}\n",
+    "ballot_ids": [
+      "7b530d90b70080cdab541f27ff475340f1749b0d41fbc9766ad2341ad13ab122",
+      "b69e5d6b21963da2e6c742fbdaade0d05404ab6e82a932887405f19640a526c4",
+      "681e78f4a27c3a7f629d18ee858c4bb6268043369982e338f003b2d3876de5e6"
+    ],
+    "ballot_canonicals": [
+      "{\"attestation_id\":null,\"created_at\":\"2026-04-24T09:00:00Z\",\"kind\":\"oc-vote/ballot\",\"option\":\"b\",\"poll_id\":\"57f8363f2ad3f6ceebbb4c1339274fb875efa999f2971b54d394d5a12eebd6d7\",\"secret\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qbob\",\"value\":\"\"},\"v\":0,\"voter\":\"bc1qbob\"}\n",
+      "{\"attestation_id\":null,\"created_at\":\"2026-04-23T09:00:00Z\",\"kind\":\"oc-vote/ballot\",\"option\":\"b\",\"poll_id\":\"57f8363f2ad3f6ceebbb4c1339274fb875efa999f2971b54d394d5a12eebd6d7\",\"secret\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qbob\",\"value\":\"\"},\"v\":0,\"voter\":\"bc1qbob\"}\n",
+      "{\"attestation_id\":null,\"created_at\":\"2026-04-23T09:00:00Z\",\"kind\":\"oc-vote/ballot\",\"option\":\"a\",\"poll_id\":\"57f8363f2ad3f6ceebbb4c1339274fb875efa999f2971b54d394d5a12eebd6d7\",\"secret\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qbob\",\"value\":\"\"},\"v\":0,\"voter\":\"bc1qbob\"}\n"
+    ],
+    "tally_with_utxos": {
+      "utxo_snapshot": {
+        "bc1qbob": [
+          {
+            "value": 50000,
+            "confirmed_height": 895000
+          }
+        ]
+      },
+      "expected_result": {
+        "state": "tallied",
+        "snapshot_block": 900000,
+        "turnout": {
+          "voters": 1,
+          "weight": 1
+        },
+        "tallies": {
+          "a": 1,
+          "b": 0
+        }
+      }
+    }
+  }
+}

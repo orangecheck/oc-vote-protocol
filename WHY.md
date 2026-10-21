@@ -166,12 +166,12 @@ Can a creator "move the deadline" after votes are cast? Not without invalidating
 
 ### H9. Nostr (kinds 30080 / 30081 / 30082) is the right discovery layer
 
-**Claim.** Polls publish as addressable kind 30080. Ballots publish as addressable kind 30081 (replaceable by voter, supporting vote changes). Reveals publish as standard kind 30082.
+**Claim.** Polls publish as addressable kind 30080. Ballots publish as addressable kind 30081 (a voter may publish again to change their vote). Reveals publish as standard kind 30082.
 
 **Adversarial test.** Why addressable for ballots?
 
-- Replaceable-by-author lets a voter revise their ballot by publishing a new event with the same `d` tag. The relay stores only the latest per-author per-d-tag. This matches the `latest` tiebreak semantics.
-- For `first` tiebreak polls, clients MUST still fetch historical ballots (Nostr relays with full history support this via filters; some relays discard replaced events, which is fine because we only care about the first one).
+- A voter revises their ballot by publishing a new event with the same `d` tag. Relays replace by author key as well as `d` tag, and each ballot event has its own key, so relays keep every version. The `tiebreak` in §8 picks the one that counts; the transport does not.
+- For `first` tiebreak polls, talliers MUST query multiple relays: a client that reused one key could let a relay keep only the newest version and lose the first one (§4.5).
 
 What if Nostr relays censor? Multi-relay publication is required (reference set: 4 diverse relays, per Lock's pattern). Tallies are reproducible as long as one cooperating relay has the data. Ballots can also be published as URL fragments, out-of-band JSON blobs, or served from any static host.
 

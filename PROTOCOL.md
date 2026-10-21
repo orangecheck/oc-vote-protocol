@@ -20,7 +20,7 @@ That is the user story OC Vote serves. Every Bitcoin-adjacent community runs int
   ┌──────────┐                                │ 30082 reveal │
   │ Voter A  │──── signs ballot (BIP-322) ──→│              │
   │ Voter B  │    publishes kind 30081        │              │
-  │ Voter C  │    (replaceable per voter)     │              │
+  │ Voter C  │    (may re-vote; tiebreak)     │              │
   └──────────┘                                └──────────────┘
                                                       │
                                                       │ anyone pulls
@@ -80,7 +80,7 @@ Total interactions: one wallet signature prompt. Zero bitcoin spent.
 ### Bob changes his mind
 
 1. Two days later Bob returns and picks `split_c`.
-2. His client builds a new ballot with a greater `created_at`, re-signs, and republishes to the same `d` tag. Conforming Nostr relays replace Bob's previous ballot automatically.
+2. His client builds a new ballot with a greater `created_at`, re-signs, and publishes it under the same `d` tag. Relays keep both events (each has its own Nostr key); the tally counts the later one because the poll's `tiebreak` is `latest`.
 3. The poll's live tally reflects the change.
 
 ### Deadline passes — anyone tallies

@@ -29,10 +29,11 @@ OC Vote owns three Nostr kinds — `30080` (poll), `30081` (ballot), `30082` (re
 
 ### 1.2 Ballot (kind 30081)
 
-- **Replacement.** Ballots are addressable events under `d = oc-vote:ballot:<poll_id>:<voter>` and are **replaceable per `(poll, voter)`** by spec (`SPEC.md` §5.2). A voter MAY publish a new ballot for the same poll any number of times before `deadline`; the tally semantics are governed by `tiebreak`:
-  - `tiebreak: last` (default) — the highest-`created_at` ballot ≤ `deadline` wins.
-  - `tiebreak: first` — the lowest-`created_at` ballot ≤ `deadline` wins. Talliers MUST query multiple relays here because Nostr replaceable-event semantics discard older versions; without multi-relay scanning a `first`-tiebreak poll is unverifiable (`SPEC.md` §5.3).
-- **Revocation.** This spec does **not** define a ballot-revocation envelope. Replacement is the substitute: a voter who wants to "unvote" SHOULD publish a new ballot whose `option_id` reflects their final choice. There is no protocol-level "abstain after voting" primitive — abstention is encoded by *not voting*.
+- **Re-voting.** Ballots are addressable events under `d = oc-vote:ballot:<poll_id>:<voter>`. A voter MAY publish a new ballot for the same poll any number of times before `deadline`. Each ballot is its own Nostr event under its own key, so relays keep the earlier ones too (`SPEC.md` §4.5); which one counts is governed by `tiebreak` (`SPEC.md` §8):
+  - `tiebreak: latest` — the highest-`created_at` ballot ≤ `deadline` wins.
+  - `tiebreak: first` — the lowest-`created_at` ballot ≤ `deadline` wins. Talliers MUST query multiple relays and keep every ballot they receive, because a client that reuses one Nostr key lets a relay discard older versions (`SPEC.md` §4.5).
+  - Equal `created_at`: the greater `ballot_id` wins under `latest`, the lesser under `first`.
+- **Revocation.** This spec does **not** define a ballot-revocation envelope. A new ballot is the substitute: a voter who wants to change or "unvote" SHOULD publish a new ballot whose `option` reflects their final choice (`withdraw` to count for nothing). There is no protocol-level "abstain after voting" primitive — abstention is encoded by *not voting*.
 - **Withdrawal of bond.** The voter's stake is whatever the weight mode evaluates against the voter's UTXOs at `snapshot_block`. A voter who spends those UTXOs before `snapshot_block` reduces or zeroes their weight in the final tally. This is permitted by Bitcoin and never blocked by this spec.
 - **Post-deadline ballots.** Talliers MUST discard ballots with `created_at > deadline`. Republishing under the same `d` after `deadline` does nothing; the tally has frozen.
 - **Out-of-protocol controls.** A voter MAY hide a ballot from a reference dashboard or publish a NIP-09 deletion request; neither affects whether the ballot is counted. Talliers MUST ignore both signals.

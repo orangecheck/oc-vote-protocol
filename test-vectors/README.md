@@ -62,6 +62,7 @@ BIP-322 signatures in these vectors are **fake placeholders** (base64 of "ALICE-
 | [`v03-sats-days-weighted.json`](./v03-sats-days-weighted.json) | `sats_days` weight with `cap_days: 180`; multi-UTXO voter; one UTXO beyond the cap |
 | [`v04-vote-change.json`](./v04-vote-change.json) | Same voter casts two ballots; `tiebreak: latest` picks the later one |
 | [`v05-secret-ballot.json`](./v05-secret-ballot.json) | Secret-mode ballot with `null` option pre-reveal + `commit`; reveal event; `awaiting_reveal` → `tallied` state transition |
+| [`v06-tiebreak-first.json`](./v06-tiebreak-first.json) | `tiebreak: first`; one voter, three ballots, two at the same earliest `created_at`, so the lesser `ballot_id` decides. Relays keep all three (SPEC §4.5); only the §8 tiebreak picks |
 
 ## Ids at a glance
 
@@ -72,6 +73,7 @@ BIP-322 signatures in these vectors are **fake placeholders** (base64 of "ALICE-
 | v03 | `571e3615…44ec9` | `b61e2b30…8f3aa` | — |
 | v04 | `8e92e84a…a235d` | `ad5402c5…26ab6`, `d51c0445…65449f` | — |
 | v05 | `cc2769b4…20e04` | `57b6f290…15ed5` | `4db64f16…a8d5` |
+| v06 | `57f8363f…bd6d7` | `7b530d90…ab122`, `b69e5d6b…526c4`, `681e78f4…de5e6` | — |
 
 (Ids in this table are truncated; the vector files have full 64-char hex.)
 

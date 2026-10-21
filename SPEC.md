@@ -187,7 +187,7 @@ At reveal time, the tallier unseals `secret.envelope` to recover `chosen_id`, re
 
 ### 4.5 Ballot publication (Nostr)
 
-A ballot is published as an addressable event of kind `30081`, replaceable per (poll, voter):
+A ballot is published as an addressable event of kind `30081`:
 
 ```
 event.kind       = 30081
@@ -205,9 +205,9 @@ event.pubkey     = ephemeral_nostr_pubkey
 event.created_at = unix_seconds
 ```
 
-The `d` tag ensures that re-publishing a ballot from the same voter for the same poll replaces the previous event at conforming relays. This implements the `tiebreak: latest` pattern at the transport layer.
+Relays replace an addressable event only by one with the same `kind`, `d` tag **and** Nostr `pubkey` (NIP-01). Each ballot event is signed with its own ephemeral key, so a voter's second ballot does not replace the first: relays keep both. The transport decides nothing about which ballot counts. The §8 tiebreak does, and a tallier MUST apply it to every valid ballot it collects for the voter rather than assume a relay returns only the latest.
 
-For `tiebreak: first` polls, tallier implementations MUST query multiple relays and collect the minimum-`created_at` ballot per voter, because replaceable events on Nostr discard older versions.
+A client that reuses one Nostr key for a voter's ballots lets a relay discard all but the newest event, which can lose the ballot a `tiebreak: first` poll counts. Talliers for `tiebreak: first` polls MUST therefore query multiple relays and keep every ballot they receive. Test vector v06 pins the tiebreak, including a tie broken by `ballot_id`.
 
 ## 5. Weight modes
 
@@ -352,8 +352,8 @@ Because `t` is a shared namespace on these events — poll id, family marker,
 and voter or creator address all use it — a tallier MUST confirm each matched
 event against its content and MUST NOT trust the tag alone: accept a ballot
 only if `content.poll_id` equals the poll being tallied, and de-duplicate by
-`ballot_id` (kind 30081 is replaceable per `(poll, voter)`, but a
-non-conforming relay may still return more than one).
+`ballot_id`. Expect several ballots per voter: each is its own Nostr event
+(§4.5), and the §8 tiebreak picks one.
 
 > **Errata (2026-09-02).** §3.4 / §3.6 / §6.3 previously specified only the
 > multi-letter `poll_id` / `voter` / `creator` tags. A `#poll_id` filter
@@ -542,7 +542,7 @@ These are explicitly NOT in v0:
 
 - Nostr event kinds:
   - **30080** — poll (addressable, general replaceable range)
-  - **30081** — ballot (addressable, replaceable per voter per poll)
+  - **30081** — ballot (addressable; each ballot event has its own key, so relays keep a voter's earlier ballots and the §8 tiebreak decides, §4.5)
   - **30082** — reveal (addressable, one per poll)
 - `d`-tag namespaces claimed by this spec: `oc-vote:poll:*`, `oc-vote:ballot:*`, `oc-vote:reveal:*`
 - File extensions: none claimed (poll / ballot / reveal objects are JSON transported via Nostr or URL fragments)

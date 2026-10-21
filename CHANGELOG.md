@@ -4,6 +4,33 @@ All notable changes to the OC Vote protocol and reference SDK.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased] — 2026-10-21 — errata: relays keep every ballot; the tiebreak decides
+
+**Errata. No envelope, canonicalization, signature or tally-algorithm change —
+every existing test vector keeps its verdict.** §4.5 said a voter's new ballot
+replaces the old one at conforming relays, so the transport implemented
+`tiebreak: latest`. NIP-01 replaces an addressable event only by one with the
+same `kind`, `d` tag and Nostr `pubkey`, and ballot events are signed with a
+fresh key each (the reference client and CLI use a random key per event), so
+relays keep every ballot. The §8 tiebreak is what decides, and always was.
+
+- **§4.5.** States the NIP-01 rule and that a tallier MUST apply the tiebreak
+  to every ballot it collects, never assume a relay returns only the latest.
+  `tiebreak: first` polls still need several relays, now for the right reason:
+  a client that reuses one key can let a relay drop the earlier ballot.
+- **§6.5 discovery note, §14.** No longer call kind 30081 "replaceable per
+  voter".
+- **`LIFECYCLE.md`.** Same correction. It also named the tiebreak `last` (the
+  value is `latest`), cited §5 for it (it is §8), called the field `option_id`
+  (it is `option`), and gave no rule for equal `created_at`.
+- **`WHY.md` H9, `PROTOCOL.md`, `README.md`.** Same correction.
+- **New vector v06.** `tiebreak: first`, one voter, three ballots, two at the
+  same earliest time: the lesser `ballot_id` decides. An implementation that
+  applies `latest`, or breaks the tie the other way, gets a different tally.
+- **CI.** A job fails on an absolute home-directory path in any tracked file.
+
+Reference implementation: `@orangecheck/vote-core` 1.5.1 passes v06 unchanged.
+
 ## [Unreleased] — 2026-10-08 — reference relay set
 
 - **§3.4** names the five relays the reference client actually uses. It listed `relay.damus.io`, which the shared default set has never included. Non-normative; nothing a client MUST do changes.
