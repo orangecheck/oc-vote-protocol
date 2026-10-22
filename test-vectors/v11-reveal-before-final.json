@@ -1,0 +1,114 @@
+{
+  "description": "secret anchored poll (SPEC §10.3): a reveal with the right key, checked when the tip is H_close + G + 5, is not accepted; the poll stays awaiting_reveal",
+  "inputs": {
+    "poll": {
+      "v": 0,
+      "kind": "oc-vote/poll",
+      "creator": "bc1qalice",
+      "question": "Secret, anchored?",
+      "options": [
+        {
+          "id": "yes",
+          "label": "Yes"
+        },
+        {
+          "id": "no",
+          "label": "No"
+        }
+      ],
+      "deadline": "2026-12-01T00:00:00Z",
+      "snapshot_block": 900000,
+      "weight_mode": "sats",
+      "weight_params": null,
+      "min_sats": 0,
+      "min_days": 0,
+      "mode": "secret",
+      "reveal_pk": "e91e79b4de059792ab2e0b883450a04c23da3d810d72784f7ad02e6502222952",
+      "tiebreak": "latest",
+      "notes": null,
+      "created_at": "2026-11-16T12:00:00Z",
+      "sig": {
+        "alg": "bip322",
+        "pubkey": "bc1qalice",
+        "value": "YmMxcWFsaWNlLXNpZ25hdHVyZS1mYWtlLWZvci10ZXN0LXZlY3Rvcg=="
+      }
+    },
+    "ballots": [
+      {
+        "v": 0,
+        "kind": "oc-vote/ballot",
+        "poll_id": "c8c8937da92b1d68951a42bd2bf73606a0ce56e69d91241c7a6186bac303580a",
+        "voter": "bc1qbob",
+        "option": null,
+        "attestation_id": null,
+        "secret": {
+          "envelope": {
+            "v": 2,
+            "kind": "identity",
+            "note": "placeholder; real envelope is produced by oc-lock-core"
+          },
+          "commit": "1727127a0d61a5b16d26cb3d3c6d08b0ce55bb02ffd6150ccc54885ec6d29de1"
+        },
+        "created_at": "2026-11-20T09:00:00Z",
+        "sig": {
+          "alg": "bip322",
+          "pubkey": "bc1qbob",
+          "value": "YmMxcWJvYi1zaWduYXR1cmUtZmFrZS1mb3ItdGVzdC12ZWN0b3I="
+        }
+      }
+    ],
+    "chain": {
+      "close_height": 925000,
+      "tip_height": 925041
+    },
+    "anchors": {
+      "00f615aba5032bf7d87c0512990124e19cb6352c818e649b1bcfef5f42ab2efe": 924995
+    },
+    "reveal": {
+      "v": 0,
+      "kind": "oc-vote/reveal",
+      "poll_id": "c8c8937da92b1d68951a42bd2bf73606a0ce56e69d91241c7a6186bac303580a",
+      "reveal_sk": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "revealed_at": "2026-12-01T00:01:00Z",
+      "sig": {
+        "alg": "bip322",
+        "pubkey": "bc1qalice",
+        "value": "YmMxcWFsaWNlLXNpZ25hdHVyZS1mYWtlLWZvci10ZXN0LXZlY3Rvcg=="
+      }
+    },
+    "revealed_options": {
+      "bc1qbob": "yes"
+    }
+  },
+  "expected": {
+    "poll_id": "c8c8937da92b1d68951a42bd2bf73606a0ce56e69d91241c7a6186bac303580a",
+    "poll_canonical": "{\"created_at\":\"2026-11-16T12:00:00Z\",\"creator\":\"bc1qalice\",\"deadline\":\"2026-12-01T00:00:00Z\",\"kind\":\"oc-vote/poll\",\"min_days\":0,\"min_sats\":0,\"mode\":\"secret\",\"notes\":null,\"options\":[{\"id\":\"yes\",\"label\":\"Yes\"},{\"id\":\"no\",\"label\":\"No\"}],\"question\":\"Secret, anchored?\",\"reveal_pk\":\"e91e79b4de059792ab2e0b883450a04c23da3d810d72784f7ad02e6502222952\",\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qalice\",\"value\":\"\"},\"snapshot_block\":900000,\"tiebreak\":\"latest\",\"v\":0,\"weight_mode\":\"sats\",\"weight_params\":null}\n",
+    "ballot_ids": [
+      "00f615aba5032bf7d87c0512990124e19cb6352c818e649b1bcfef5f42ab2efe"
+    ],
+    "ballot_canonicals": [
+      "{\"attestation_id\":null,\"created_at\":\"2026-11-20T09:00:00Z\",\"kind\":\"oc-vote/ballot\",\"option\":null,\"poll_id\":\"c8c8937da92b1d68951a42bd2bf73606a0ce56e69d91241c7a6186bac303580a\",\"secret\":{\"commit\":\"1727127a0d61a5b16d26cb3d3c6d08b0ce55bb02ffd6150ccc54885ec6d29de1\",\"envelope\":{\"kind\":\"identity\",\"note\":\"placeholder; real envelope is produced by oc-lock-core\",\"v\":2}},\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qbob\",\"value\":\"\"},\"v\":0,\"voter\":\"bc1qbob\"}\n"
+    ],
+    "reveal_id": "0833a42fea21b4c2d64ad1ed3f4e7d6d016b5a96d8f4edf5700ee3e5cae9a7d9",
+    "reveal_canonical": "{\"kind\":\"oc-vote/reveal\",\"poll_id\":\"c8c8937da92b1d68951a42bd2bf73606a0ce56e69d91241c7a6186bac303580a\",\"reveal_sk\":\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\",\"revealed_at\":\"2026-12-01T00:01:00Z\",\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qalice\",\"value\":\"\"},\"v\":0}\n",
+    "commits": {
+      "bc1qbob": "1727127a0d61a5b16d26cb3d3c6d08b0ce55bb02ffd6150ccc54885ec6d29de1"
+    },
+    "reveal_accepted": false,
+    "tally_with_utxos": {
+      "utxo_snapshot": {
+        "bc1qbob": [
+          {
+            "value": 500000,
+            "confirmed_height": 890000
+          }
+        ]
+      },
+      "expected_result": {
+        "state": "awaiting_reveal",
+        "basis": "anchored",
+        "close_height": 925000
+      }
+    }
+  }
+}

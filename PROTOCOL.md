@@ -54,7 +54,7 @@ Alice coordinates a small group of Bitcoin grant recipients. They want to alloca
    - Question: *"Which grant allocation split should we adopt?"*
    - Options: `split_a` ("60/30/10"), `split_b` ("40/40/20"), `split_c` ("equal thirds")
    - Deadline: `2026-05-08T00:00:00Z`
-   - Snapshot block: `"deadline"` (resolved to chain tip at close)
+   - Snapshot block: `"deadline"` (resolved to `H_close`, the last block at the deadline)
    - Weight mode: `sats_days`, cap 180 days
    - `min_sats`: `100000`, `min_days`: `30`
    - Mode: `public`
@@ -85,7 +85,7 @@ Total interactions: one wallet signature prompt. Zero bitcoin spent.
 
 ### Deadline passes — anyone tallies
 
-1. At `deadline`, the client derives the snapshot block: the greatest block whose `median_time_past ≤ deadline` and which has ≥ 6 confirmations. Say it lands on height `900,412`.
+1. After `deadline`, the client derives the snapshot block: `H_close`, the greatest block height whose `median_time_past ≤ deadline`, once it has ≥ 6 confirmations. Say it lands on height `900,412`.
 2. Observer Carol (maybe a grant committee member, maybe an interested outsider) runs the tally:
    - Fetch the poll and all ballots matching `poll_id` from Nostr.
    - For each ballot, verify `voter`'s BIP-322 signature.
@@ -98,16 +98,23 @@ Total interactions: one wallet signature prompt. Zero bitcoin spent.
    ```json
    {
      "state": "tallied",
+     "basis": "voter_clocks",
      "snapshot_block": 900412,
      "turnout": { "voters": 47, "weight": 2814300000 },
      "tallies": {
        "split_a": 812300000,
        "split_b": 1102900000,
        "split_c":  899100000
-     }
+     },
+     "counted": ["<the ballot_id that stood for each voter, sorted>"]
    }
    ```
+   `basis: "voter_clocks"` says each ballot was dated by its voter's own clock: this poll's deadline is before 2026-11-15.
 4. The `vote.ochk.io/p/<poll_id>` page displays the same numbers. So does any self-hosted tally CLI. The result is not *hosted* anywhere; it's *computed* everywhere.
+
+### The same poll with a later deadline
+
+A poll whose deadline is on or after 2026-11-15T00:00:00Z is anchored (SPEC §4.6). Bob's client also stamps his ballot with OC Stamp and sends the stamp id to OpenTimestamps calendars; vote.ochk.io's anchorer stamps every ballot it sees as a fallback. Carol's tally then checks each ballot's anchor against Bitcoin block headers and counts only ballots anchored at or below `H_close + G` (`G` = 36 blocks). Until her chain tip reaches `H_close + G + 6` her result says `"state": "provisional"` and how many counted ballots are not yet anchored; after that it is `"tallied"` with `"basis": "anchored"`.
 
 Total bytes on-chain: zero. Total external services relied upon for correctness: zero (Nostr is only a default transport).
 
@@ -120,9 +127,11 @@ Everything else is identical to Flow 1. The tally is:
 ```json
 {
   "state": "tallied",
+  "basis": "voter_clocks",
   "snapshot_block": 902988,
   "turnout": { "voters": 312, "weight": 312 },
-  "tallies": { "yes": 214, "no": 98 }
+  "tallies": { "yes": 214, "no": 98 },
+  "counted": ["<312 ballot ids, sorted>"]
 }
 ```
 
@@ -152,7 +161,7 @@ Anyone can see Bob voted. Nobody (except Alice, who holds `reveal_sk`) can see *
 
 ### Close and reveal
 
-1. At deadline, Alice returns and clicks "Publish reveal."
+1. At deadline, Alice returns and clicks "Publish reveal." In an anchored poll (deadline on or after 2026-11-15) talliers accept the reveal only once their chain tip reaches `H_close + G + 6`, roughly eight hours after the deadline (SPEC §10.3), so her client waits until then.
 2. The client builds a kind-30082 reveal event: `{ poll_id, reveal_sk, revealed_at, sig }`. Alice signs with BIP-322.
 3. Every observer's tally function now:
    - Fetches the reveal, verifies Alice's signature on it.

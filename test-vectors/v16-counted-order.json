@@ -1,0 +1,173 @@
+{
+  "description": "counted (SPEC §8) lists the ballot_id of each voter's standing ballot as lowercase hex in ascending order: not in input order and not by voter. A voter's superseded ballot is not listed; a withdrawal and a ballot that weighs zero are",
+  "inputs": {
+    "poll": {
+      "v": 0,
+      "kind": "oc-vote/poll",
+      "creator": "bc1qalice",
+      "question": "Which order?",
+      "options": [
+        {
+          "id": "yes",
+          "label": "Yes"
+        },
+        {
+          "id": "no",
+          "label": "No"
+        }
+      ],
+      "deadline": "2026-11-14T00:00:00Z",
+      "snapshot_block": 900000,
+      "weight_mode": "sats",
+      "weight_params": null,
+      "min_sats": 0,
+      "min_days": 0,
+      "mode": "public",
+      "reveal_pk": null,
+      "tiebreak": "latest",
+      "notes": null,
+      "created_at": "2026-11-01T00:00:00Z",
+      "sig": {
+        "alg": "bip322",
+        "pubkey": "bc1qalice",
+        "value": "YmMxcWFsaWNlLXNpZ25hdHVyZS1mYWtlLWZvci10ZXN0LXZlY3Rvcg=="
+      }
+    },
+    "ballots": [
+      {
+        "v": 0,
+        "kind": "oc-vote/ballot",
+        "poll_id": "5be35db71c7c29b213a61206d0bc9c08efcd9a9627b82d0ffc35594eaaf15b46",
+        "voter": "bc1qerin",
+        "option": "yes",
+        "attestation_id": null,
+        "secret": null,
+        "created_at": "2026-11-10T09:05:00Z",
+        "sig": {
+          "alg": "bip322",
+          "pubkey": "bc1qerin",
+          "value": "YmMxcWVyaW4tc2lnbmF0dXJlLWZha2UtZm9yLXRlc3QtdmVjdG9y"
+        }
+      },
+      {
+        "v": 0,
+        "kind": "oc-vote/ballot",
+        "poll_id": "5be35db71c7c29b213a61206d0bc9c08efcd9a9627b82d0ffc35594eaaf15b46",
+        "voter": "bc1qbob",
+        "option": "no",
+        "attestation_id": null,
+        "secret": null,
+        "created_at": "2026-11-10T09:01:00Z",
+        "sig": {
+          "alg": "bip322",
+          "pubkey": "bc1qbob",
+          "value": "YmMxcWJvYi1zaWduYXR1cmUtZmFrZS1mb3ItdGVzdC12ZWN0b3I="
+        }
+      },
+      {
+        "v": 0,
+        "kind": "oc-vote/ballot",
+        "poll_id": "5be35db71c7c29b213a61206d0bc9c08efcd9a9627b82d0ffc35594eaaf15b46",
+        "voter": "bc1qcarol",
+        "option": "no",
+        "attestation_id": null,
+        "secret": null,
+        "created_at": "2026-11-10T09:03:00Z",
+        "sig": {
+          "alg": "bip322",
+          "pubkey": "bc1qcarol",
+          "value": "YmMxcWNhcm9sLXNpZ25hdHVyZS1mYWtlLWZvci10ZXN0LXZlY3Rvcg=="
+        }
+      },
+      {
+        "v": 0,
+        "kind": "oc-vote/ballot",
+        "poll_id": "5be35db71c7c29b213a61206d0bc9c08efcd9a9627b82d0ffc35594eaaf15b46",
+        "voter": "bc1qdave",
+        "option": "withdraw",
+        "attestation_id": null,
+        "secret": null,
+        "created_at": "2026-11-10T09:04:00Z",
+        "sig": {
+          "alg": "bip322",
+          "pubkey": "bc1qdave",
+          "value": "YmMxcWRhdmUtc2lnbmF0dXJlLWZha2UtZm9yLXRlc3QtdmVjdG9y"
+        }
+      },
+      {
+        "v": 0,
+        "kind": "oc-vote/ballot",
+        "poll_id": "5be35db71c7c29b213a61206d0bc9c08efcd9a9627b82d0ffc35594eaaf15b46",
+        "voter": "bc1qbob",
+        "option": "yes",
+        "attestation_id": null,
+        "secret": null,
+        "created_at": "2026-11-10T09:02:00Z",
+        "sig": {
+          "alg": "bip322",
+          "pubkey": "bc1qbob",
+          "value": "YmMxcWJvYi1zaWduYXR1cmUtZmFrZS1mb3ItdGVzdC12ZWN0b3I="
+        }
+      }
+    ]
+  },
+  "expected": {
+    "poll_id": "5be35db71c7c29b213a61206d0bc9c08efcd9a9627b82d0ffc35594eaaf15b46",
+    "poll_canonical": "{\"created_at\":\"2026-11-01T00:00:00Z\",\"creator\":\"bc1qalice\",\"deadline\":\"2026-11-14T00:00:00Z\",\"kind\":\"oc-vote/poll\",\"min_days\":0,\"min_sats\":0,\"mode\":\"public\",\"notes\":null,\"options\":[{\"id\":\"yes\",\"label\":\"Yes\"},{\"id\":\"no\",\"label\":\"No\"}],\"question\":\"Which order?\",\"reveal_pk\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qalice\",\"value\":\"\"},\"snapshot_block\":900000,\"tiebreak\":\"latest\",\"v\":0,\"weight_mode\":\"sats\",\"weight_params\":null}\n",
+    "ballot_ids": [
+      "97cfc4aea9fe7cc8eaaeed8efa3cd1fb1248653d23b09ec5e4f518ef4c7e8008",
+      "9dff35555622414fb90eb816fc03887668568c5a97726904d06d4c65a093bfd4",
+      "03086c6c01c62633740ea3c681994a24564825ba2ebd7a7f06238679f56d084e",
+      "097f3e0eb110d0461b12ff3e10a3861dfedb7fd28f5f19c12e7a2437b0efae2b",
+      "f5e56afcbc8e98a7710455cdcf21c83b7c91d0d29df6786da426b23cbff9022e"
+    ],
+    "ballot_canonicals": [
+      "{\"attestation_id\":null,\"created_at\":\"2026-11-10T09:05:00Z\",\"kind\":\"oc-vote/ballot\",\"option\":\"yes\",\"poll_id\":\"5be35db71c7c29b213a61206d0bc9c08efcd9a9627b82d0ffc35594eaaf15b46\",\"secret\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qerin\",\"value\":\"\"},\"v\":0,\"voter\":\"bc1qerin\"}\n",
+      "{\"attestation_id\":null,\"created_at\":\"2026-11-10T09:01:00Z\",\"kind\":\"oc-vote/ballot\",\"option\":\"no\",\"poll_id\":\"5be35db71c7c29b213a61206d0bc9c08efcd9a9627b82d0ffc35594eaaf15b46\",\"secret\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qbob\",\"value\":\"\"},\"v\":0,\"voter\":\"bc1qbob\"}\n",
+      "{\"attestation_id\":null,\"created_at\":\"2026-11-10T09:03:00Z\",\"kind\":\"oc-vote/ballot\",\"option\":\"no\",\"poll_id\":\"5be35db71c7c29b213a61206d0bc9c08efcd9a9627b82d0ffc35594eaaf15b46\",\"secret\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qcarol\",\"value\":\"\"},\"v\":0,\"voter\":\"bc1qcarol\"}\n",
+      "{\"attestation_id\":null,\"created_at\":\"2026-11-10T09:04:00Z\",\"kind\":\"oc-vote/ballot\",\"option\":\"withdraw\",\"poll_id\":\"5be35db71c7c29b213a61206d0bc9c08efcd9a9627b82d0ffc35594eaaf15b46\",\"secret\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qdave\",\"value\":\"\"},\"v\":0,\"voter\":\"bc1qdave\"}\n",
+      "{\"attestation_id\":null,\"created_at\":\"2026-11-10T09:02:00Z\",\"kind\":\"oc-vote/ballot\",\"option\":\"yes\",\"poll_id\":\"5be35db71c7c29b213a61206d0bc9c08efcd9a9627b82d0ffc35594eaaf15b46\",\"secret\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qbob\",\"value\":\"\"},\"v\":0,\"voter\":\"bc1qbob\"}\n"
+    ],
+    "tally_with_utxos": {
+      "utxo_snapshot": {
+        "bc1qbob": [
+          {
+            "value": 100000,
+            "confirmed_height": 890000
+          }
+        ],
+        "bc1qcarol": [
+          {
+            "value": 300000,
+            "confirmed_height": 890000
+          }
+        ],
+        "bc1qdave": [
+          {
+            "value": 200000,
+            "confirmed_height": 890000
+          }
+        ]
+      },
+      "expected_result": {
+        "state": "tallied",
+        "basis": "voter_clocks",
+        "snapshot_block": 900000,
+        "turnout": {
+          "voters": 2,
+          "weight": 400000
+        },
+        "tallies": {
+          "yes": 100000,
+          "no": 300000
+        },
+        "counted": [
+          "03086c6c01c62633740ea3c681994a24564825ba2ebd7a7f06238679f56d084e",
+          "097f3e0eb110d0461b12ff3e10a3861dfedb7fd28f5f19c12e7a2437b0efae2b",
+          "97cfc4aea9fe7cc8eaaeed8efa3cd1fb1248653d23b09ec5e4f518ef4c7e8008",
+          "f5e56afcbc8e98a7710455cdcf21c83b7c91d0d29df6786da426b23cbff9022e"
+        ]
+      }
+    }
+  }
+}

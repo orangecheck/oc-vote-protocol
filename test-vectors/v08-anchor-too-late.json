@@ -1,0 +1,145 @@
+{
+  "description": "anchored poll (SPEC §4.6): a ballot dated at the deadline but anchored at H_close + G + 1, and one with no anchor, are dropped from the final tally (E_NOT_ANCHORED)",
+  "inputs": {
+    "poll": {
+      "v": 0,
+      "kind": "oc-vote/poll",
+      "creator": "bc1qalice",
+      "question": "Anchor the ballots?",
+      "options": [
+        {
+          "id": "yes",
+          "label": "Yes"
+        },
+        {
+          "id": "no",
+          "label": "No"
+        }
+      ],
+      "deadline": "2026-12-01T00:00:00Z",
+      "snapshot_block": 900000,
+      "weight_mode": "sats",
+      "weight_params": null,
+      "min_sats": 0,
+      "min_days": 0,
+      "mode": "public",
+      "reveal_pk": null,
+      "tiebreak": "latest",
+      "notes": null,
+      "created_at": "2026-11-16T12:00:00Z",
+      "sig": {
+        "alg": "bip322",
+        "pubkey": "bc1qalice",
+        "value": "YmMxcWFsaWNlLXNpZ25hdHVyZS1mYWtlLWZvci10ZXN0LXZlY3Rvcg=="
+      }
+    },
+    "ballots": [
+      {
+        "v": 0,
+        "kind": "oc-vote/ballot",
+        "poll_id": "411a57b8722b09a80ce1a9f727db097644b3f7731053f3732b2da3261f05ebed",
+        "voter": "bc1qbob",
+        "option": "yes",
+        "attestation_id": null,
+        "secret": null,
+        "created_at": "2026-11-20T09:00:00Z",
+        "sig": {
+          "alg": "bip322",
+          "pubkey": "bc1qbob",
+          "value": "YmMxcWJvYi1zaWduYXR1cmUtZmFrZS1mb3ItdGVzdC12ZWN0b3I="
+        }
+      },
+      {
+        "v": 0,
+        "kind": "oc-vote/ballot",
+        "poll_id": "411a57b8722b09a80ce1a9f727db097644b3f7731053f3732b2da3261f05ebed",
+        "voter": "bc1qcarol",
+        "option": "no",
+        "attestation_id": null,
+        "secret": null,
+        "created_at": "2026-12-01T00:00:00Z",
+        "sig": {
+          "alg": "bip322",
+          "pubkey": "bc1qcarol",
+          "value": "YmMxcWNhcm9sLXNpZ25hdHVyZS1mYWtlLWZvci10ZXN0LXZlY3Rvcg=="
+        }
+      },
+      {
+        "v": 0,
+        "kind": "oc-vote/ballot",
+        "poll_id": "411a57b8722b09a80ce1a9f727db097644b3f7731053f3732b2da3261f05ebed",
+        "voter": "bc1qdave",
+        "option": "no",
+        "attestation_id": null,
+        "secret": null,
+        "created_at": "2026-11-30T23:00:00Z",
+        "sig": {
+          "alg": "bip322",
+          "pubkey": "bc1qdave",
+          "value": "YmMxcWRhdmUtc2lnbmF0dXJlLWZha2UtZm9yLXRlc3QtdmVjdG9y"
+        }
+      }
+    ],
+    "chain": {
+      "close_height": 925000,
+      "tip_height": 925042
+    },
+    "anchors": {
+      "0e8199aa1c3ba4cca47cfe36cbce7c8c1b861643310fa692541e232407f41c97": 925003,
+      "a09a4dc9d77b7dba0486ac3aefd57273c32213260fd311f1545d2986d3bedfad": 925037
+    }
+  },
+  "expected": {
+    "poll_id": "411a57b8722b09a80ce1a9f727db097644b3f7731053f3732b2da3261f05ebed",
+    "poll_canonical": "{\"created_at\":\"2026-11-16T12:00:00Z\",\"creator\":\"bc1qalice\",\"deadline\":\"2026-12-01T00:00:00Z\",\"kind\":\"oc-vote/poll\",\"min_days\":0,\"min_sats\":0,\"mode\":\"public\",\"notes\":null,\"options\":[{\"id\":\"yes\",\"label\":\"Yes\"},{\"id\":\"no\",\"label\":\"No\"}],\"question\":\"Anchor the ballots?\",\"reveal_pk\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qalice\",\"value\":\"\"},\"snapshot_block\":900000,\"tiebreak\":\"latest\",\"v\":0,\"weight_mode\":\"sats\",\"weight_params\":null}\n",
+    "ballot_ids": [
+      "0e8199aa1c3ba4cca47cfe36cbce7c8c1b861643310fa692541e232407f41c97",
+      "a09a4dc9d77b7dba0486ac3aefd57273c32213260fd311f1545d2986d3bedfad",
+      "ead61dc0837b1ff906d9741f4304aa504449531eefafc018a04584c4c35f60e3"
+    ],
+    "ballot_canonicals": [
+      "{\"attestation_id\":null,\"created_at\":\"2026-11-20T09:00:00Z\",\"kind\":\"oc-vote/ballot\",\"option\":\"yes\",\"poll_id\":\"411a57b8722b09a80ce1a9f727db097644b3f7731053f3732b2da3261f05ebed\",\"secret\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qbob\",\"value\":\"\"},\"v\":0,\"voter\":\"bc1qbob\"}\n",
+      "{\"attestation_id\":null,\"created_at\":\"2026-12-01T00:00:00Z\",\"kind\":\"oc-vote/ballot\",\"option\":\"no\",\"poll_id\":\"411a57b8722b09a80ce1a9f727db097644b3f7731053f3732b2da3261f05ebed\",\"secret\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qcarol\",\"value\":\"\"},\"v\":0,\"voter\":\"bc1qcarol\"}\n",
+      "{\"attestation_id\":null,\"created_at\":\"2026-11-30T23:00:00Z\",\"kind\":\"oc-vote/ballot\",\"option\":\"no\",\"poll_id\":\"411a57b8722b09a80ce1a9f727db097644b3f7731053f3732b2da3261f05ebed\",\"secret\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qdave\",\"value\":\"\"},\"v\":0,\"voter\":\"bc1qdave\"}\n"
+    ],
+    "tally_with_utxos": {
+      "utxo_snapshot": {
+        "bc1qbob": [
+          {
+            "value": 100000,
+            "confirmed_height": 890000
+          }
+        ],
+        "bc1qcarol": [
+          {
+            "value": 300000,
+            "confirmed_height": 890000
+          }
+        ],
+        "bc1qdave": [
+          {
+            "value": 200000,
+            "confirmed_height": 890000
+          }
+        ]
+      },
+      "expected_result": {
+        "state": "tallied",
+        "basis": "anchored",
+        "close_height": 925000,
+        "snapshot_block": 900000,
+        "turnout": {
+          "voters": 1,
+          "weight": 100000
+        },
+        "tallies": {
+          "yes": 100000,
+          "no": 0
+        },
+        "counted": [
+          "0e8199aa1c3ba4cca47cfe36cbce7c8c1b861643310fa692541e232407f41c97"
+        ]
+      }
+    }
+  }
+}

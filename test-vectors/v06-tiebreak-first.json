@@ -105,6 +105,7 @@
       },
       "expected_result": {
         "state": "tallied",
+        "basis": "voter_clocks",
         "snapshot_block": 900000,
         "turnout": {
           "voters": 1,
@@ -113,7 +114,10 @@
         "tallies": {
           "a": 1,
           "b": 0
-        }
+        },
+        "counted": [
+          "681e78f4a27c3a7f629d18ee858c4bb6268043369982e338f003b2d3876de5e6"
+        ]
       }
     }
   }

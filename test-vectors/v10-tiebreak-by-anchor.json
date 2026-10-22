@@ -1,0 +1,116 @@
+{
+  "description": "anchored poll, tiebreak first (SPEC §8): the ballot anchored in the lower block wins over one with an earlier created_at anchored later",
+  "inputs": {
+    "poll": {
+      "v": 0,
+      "kind": "oc-vote/poll",
+      "creator": "bc1qalice",
+      "question": "Which ballot locks?",
+      "options": [
+        {
+          "id": "yes",
+          "label": "Yes"
+        },
+        {
+          "id": "no",
+          "label": "No"
+        }
+      ],
+      "deadline": "2026-12-01T00:00:00Z",
+      "snapshot_block": 900000,
+      "weight_mode": "sats",
+      "weight_params": null,
+      "min_sats": 0,
+      "min_days": 0,
+      "mode": "public",
+      "reveal_pk": null,
+      "tiebreak": "first",
+      "notes": null,
+      "created_at": "2026-11-16T12:00:00Z",
+      "sig": {
+        "alg": "bip322",
+        "pubkey": "bc1qalice",
+        "value": "YmMxcWFsaWNlLXNpZ25hdHVyZS1mYWtlLWZvci10ZXN0LXZlY3Rvcg=="
+      }
+    },
+    "ballots": [
+      {
+        "v": 0,
+        "kind": "oc-vote/ballot",
+        "poll_id": "8a93841026a250fba9dba99e8daacaf7810fc089eec301b445d5b3c976e49dbb",
+        "voter": "bc1qbob",
+        "option": "no",
+        "attestation_id": null,
+        "secret": null,
+        "created_at": "2026-11-10T09:00:00Z",
+        "sig": {
+          "alg": "bip322",
+          "pubkey": "bc1qbob",
+          "value": "YmMxcWJvYi1zaWduYXR1cmUtZmFrZS1mb3ItdGVzdC12ZWN0b3I="
+        }
+      },
+      {
+        "v": 0,
+        "kind": "oc-vote/ballot",
+        "poll_id": "8a93841026a250fba9dba99e8daacaf7810fc089eec301b445d5b3c976e49dbb",
+        "voter": "bc1qbob",
+        "option": "yes",
+        "attestation_id": null,
+        "secret": null,
+        "created_at": "2026-11-20T09:00:00Z",
+        "sig": {
+          "alg": "bip322",
+          "pubkey": "bc1qbob",
+          "value": "YmMxcWJvYi1zaWduYXR1cmUtZmFrZS1mb3ItdGVzdC12ZWN0b3I="
+        }
+      }
+    ],
+    "chain": {
+      "close_height": 925000,
+      "tip_height": 925042
+    },
+    "anchors": {
+      "aa0b6a988317ac0e23dc565d74374056b729f317d9ec5132f5896adaee0c8484": 924950,
+      "06cc07f993f05ea84ba51424a9be4e5e19650ed680c788fc523012f09222b400": 924990
+    }
+  },
+  "expected": {
+    "poll_id": "8a93841026a250fba9dba99e8daacaf7810fc089eec301b445d5b3c976e49dbb",
+    "poll_canonical": "{\"created_at\":\"2026-11-16T12:00:00Z\",\"creator\":\"bc1qalice\",\"deadline\":\"2026-12-01T00:00:00Z\",\"kind\":\"oc-vote/poll\",\"min_days\":0,\"min_sats\":0,\"mode\":\"public\",\"notes\":null,\"options\":[{\"id\":\"yes\",\"label\":\"Yes\"},{\"id\":\"no\",\"label\":\"No\"}],\"question\":\"Which ballot locks?\",\"reveal_pk\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qalice\",\"value\":\"\"},\"snapshot_block\":900000,\"tiebreak\":\"first\",\"v\":0,\"weight_mode\":\"sats\",\"weight_params\":null}\n",
+    "ballot_ids": [
+      "06cc07f993f05ea84ba51424a9be4e5e19650ed680c788fc523012f09222b400",
+      "aa0b6a988317ac0e23dc565d74374056b729f317d9ec5132f5896adaee0c8484"
+    ],
+    "ballot_canonicals": [
+      "{\"attestation_id\":null,\"created_at\":\"2026-11-10T09:00:00Z\",\"kind\":\"oc-vote/ballot\",\"option\":\"no\",\"poll_id\":\"8a93841026a250fba9dba99e8daacaf7810fc089eec301b445d5b3c976e49dbb\",\"secret\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qbob\",\"value\":\"\"},\"v\":0,\"voter\":\"bc1qbob\"}\n",
+      "{\"attestation_id\":null,\"created_at\":\"2026-11-20T09:00:00Z\",\"kind\":\"oc-vote/ballot\",\"option\":\"yes\",\"poll_id\":\"8a93841026a250fba9dba99e8daacaf7810fc089eec301b445d5b3c976e49dbb\",\"secret\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qbob\",\"value\":\"\"},\"v\":0,\"voter\":\"bc1qbob\"}\n"
+    ],
+    "tally_with_utxos": {
+      "utxo_snapshot": {
+        "bc1qbob": [
+          {
+            "value": 100000,
+            "confirmed_height": 890000
+          }
+        ]
+      },
+      "expected_result": {
+        "state": "tallied",
+        "basis": "anchored",
+        "close_height": 925000,
+        "snapshot_block": 900000,
+        "turnout": {
+          "voters": 1,
+          "weight": 100000
+        },
+        "tallies": {
+          "yes": 100000,
+          "no": 0
+        },
+        "counted": [
+          "aa0b6a988317ac0e23dc565d74374056b729f317d9ec5132f5896adaee0c8484"
+        ]
+      }
+    }
+  }
+}

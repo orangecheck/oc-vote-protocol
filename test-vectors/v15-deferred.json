@@ -1,0 +1,87 @@
+{
+  "description": "anchored poll with snapshot_block \"deadline\" (SPEC §3.3, §8, §10.5): at tip H_close + 3 the snapshot block has 4 confirmations, so the result is deferred with E_REORG, and still carries basis and close_height",
+  "inputs": {
+    "poll": {
+      "v": 0,
+      "kind": "oc-vote/poll",
+      "creator": "bc1qalice",
+      "question": "Snapshot at the deadline?",
+      "options": [
+        {
+          "id": "yes",
+          "label": "Yes"
+        },
+        {
+          "id": "no",
+          "label": "No"
+        }
+      ],
+      "deadline": "2026-12-01T00:00:00Z",
+      "snapshot_block": "deadline",
+      "weight_mode": "sats",
+      "weight_params": null,
+      "min_sats": 0,
+      "min_days": 0,
+      "mode": "public",
+      "reveal_pk": null,
+      "tiebreak": "latest",
+      "notes": null,
+      "created_at": "2026-11-16T12:00:00Z",
+      "sig": {
+        "alg": "bip322",
+        "pubkey": "bc1qalice",
+        "value": "YmMxcWFsaWNlLXNpZ25hdHVyZS1mYWtlLWZvci10ZXN0LXZlY3Rvcg=="
+      }
+    },
+    "ballots": [
+      {
+        "v": 0,
+        "kind": "oc-vote/ballot",
+        "poll_id": "df538742603e28bfdd32db7b632e87590d9f92966b20fc2eee84a6374660bf54",
+        "voter": "bc1qbob",
+        "option": "yes",
+        "attestation_id": null,
+        "secret": null,
+        "created_at": "2026-11-20T09:00:00Z",
+        "sig": {
+          "alg": "bip322",
+          "pubkey": "bc1qbob",
+          "value": "YmMxcWJvYi1zaWduYXR1cmUtZmFrZS1mb3ItdGVzdC12ZWN0b3I="
+        }
+      }
+    ],
+    "chain": {
+      "close_height": 925000,
+      "tip_height": 925003
+    },
+    "anchors": {
+      "eabeb2d3007c19b87999acd386da35701127e5d46ba91247427777466cb15338": 924970
+    }
+  },
+  "expected": {
+    "poll_id": "df538742603e28bfdd32db7b632e87590d9f92966b20fc2eee84a6374660bf54",
+    "poll_canonical": "{\"created_at\":\"2026-11-16T12:00:00Z\",\"creator\":\"bc1qalice\",\"deadline\":\"2026-12-01T00:00:00Z\",\"kind\":\"oc-vote/poll\",\"min_days\":0,\"min_sats\":0,\"mode\":\"public\",\"notes\":null,\"options\":[{\"id\":\"yes\",\"label\":\"Yes\"},{\"id\":\"no\",\"label\":\"No\"}],\"question\":\"Snapshot at the deadline?\",\"reveal_pk\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qalice\",\"value\":\"\"},\"snapshot_block\":\"deadline\",\"tiebreak\":\"latest\",\"v\":0,\"weight_mode\":\"sats\",\"weight_params\":null}\n",
+    "ballot_ids": [
+      "eabeb2d3007c19b87999acd386da35701127e5d46ba91247427777466cb15338"
+    ],
+    "ballot_canonicals": [
+      "{\"attestation_id\":null,\"created_at\":\"2026-11-20T09:00:00Z\",\"kind\":\"oc-vote/ballot\",\"option\":\"yes\",\"poll_id\":\"df538742603e28bfdd32db7b632e87590d9f92966b20fc2eee84a6374660bf54\",\"secret\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1qbob\",\"value\":\"\"},\"v\":0,\"voter\":\"bc1qbob\"}\n"
+    ],
+    "tally_with_utxos": {
+      "utxo_snapshot": {
+        "bc1qbob": [
+          {
+            "value": 100000,
+            "confirmed_height": 890000
+          }
+        ]
+      },
+      "expected_result": {
+        "state": "deferred",
+        "code": "E_REORG",
+        "basis": "anchored",
+        "close_height": 925000
+      }
+    }
+  }
+}

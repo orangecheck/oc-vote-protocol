@@ -16,6 +16,8 @@
 - `AEAD()` = AES-256-GCM per NIST SP 800-38D (12-byte IV, 16-byte tag).
 - `KDF()` = HKDF-SHA256 per RFC 5869.
 - `iso8601_utc` = `YYYY-MM-DDTHH:MM:SSZ` or `YYYY-MM-DDTHH:MM:SS.sssZ`.
+- `instant(t)` = the moment an `iso8601_utc` string names. Times are compared as instants.
+- `H_close` = the greatest block height whose `median_time_past` ≤ `deadline`; `none` until a block whose `median_time_past` is after `deadline` exists (§4.6). `G` = 36 blocks.
 - Canonical JSON = UTF-8 encoded JSON with lexicographically sorted object keys, no insignificant whitespace, LF-terminated. See §7 and [RFC 8785](https://www.rfc-editor.org/rfc/rfc8785).
 
 ## 1. Actors
@@ -85,13 +87,13 @@ Equivalently: compute the canonical serialization with `sig.value` set to the em
 - `question` — REQUIRED.
 - `options` — MUST contain at least 2 entries. Option ids MUST be unique within the poll. Reserved option id: `"withdraw"` (see §4.3).
 - `deadline` — MUST be an `iso8601_utc` string (§0), strictly in the future at the time of publication.
-- `snapshot_block` — integer (a specific block height known at poll creation) or the literal string `"deadline"` (deferred to the chain tip at `deadline`). In the deferred case, the tallier MUST use the block whose `median_time_past` is the greatest value `≤ deadline` and has ≥ 6 confirmations.
+- `snapshot_block` — integer (a specific block height known at poll creation) or the literal string `"deadline"` (deferred to the last block at `deadline`). In the deferred case, the tallier MUST use `H_close` (§0), the greatest block height whose `median_time_past` ≤ `deadline`, and only once it has ≥ 6 confirmations.
 - `weight_mode` — one of the canonical modes in §5, or a registered extension name (§11).
 - `weight_params` — shape is weight_mode-dependent. See §5.
 - `min_sats`, `min_days` — non-negative integers. A voter whose qualifying UTXOs do not meet `min_sats` (aged ≥ `min_days` at snapshot) contributes zero weight.
 - `mode` — `"public"` means ballots contain a plaintext `option`. `"secret"` means ballots carry an encrypted option envelope; `reveal_pk` MUST be set.
 - `reveal_pk` — REQUIRED when `mode == "secret"`, MUST be `null` otherwise.
-- `tiebreak` — `"latest"` (highest `created_at`, ties broken by lexicographic ballot id) or `"first"` (lowest `created_at`, ties broken by lexicographic ballot id).
+- `tiebreak` — `"latest"` or `"first"`: which of a voter's ballots counts (§8 `choose_by_tiebreak`).
 - `notes` — free-form UTF-8; MUST NOT affect tally.
 - `created_at` — at or before publication time. SHOULD be UTC.
 - `sig` — BIP-322 signature by `creator` over `poll_id`.
@@ -170,7 +172,7 @@ nostr_sk := HKDF(ikm=poll_local_secret, salt="oc-vote/v0/nostr-key", info=poll_i
 - `secret`:
   - In `public` mode: MUST be `null`.
   - In `secret` mode: REQUIRED. `envelope` is a valid OC Lock v2 envelope addressed to the poll's `reveal_pk` (see §6). `commit` is a binding commitment so the voter cannot claim a different option at reveal time.
-- `created_at` — MUST be an `iso8601_utc` string (§0), and SHOULD be before `deadline`. The tally discards a ballot whose `created_at` is not `iso8601_utc` (for example a time with no zone, an offset, or a date that does not exist), and one with `created_at > deadline`.
+- `created_at` — MUST be an `iso8601_utc` string (§0), and SHOULD be before `deadline`. The tally discards a ballot whose `created_at` is not `iso8601_utc` (for example a time with no zone, an offset, or a date that does not exist), and one with `created_at > deadline`. The voter writes `created_at`; in an anchored poll the ballot's anchor (§4.6) decides whether it is in time.
 - `sig` — BIP-322 signature by `voter` over `ballot_id`.
 
 ### 4.4 The commitment in secret mode
@@ -208,6 +210,91 @@ event.created_at = unix_seconds
 Relays replace an addressable event only by one with the same `kind`, `d` tag **and** Nostr `pubkey` (NIP-01). Each ballot event is signed with its own ephemeral key, so a voter's second ballot does not replace the first: relays keep both. The transport decides nothing about which ballot counts. The §8 tiebreak does, and a tallier MUST apply it to every valid ballot it collects for the voter rather than assume a relay returns only the latest.
 
 A client that reuses one Nostr key for a voter's ballots lets a relay discard all but the newest event, which can lose the ballot a `tiebreak: first` poll counts. Talliers for `tiebreak: first` polls MUST therefore query multiple relays and keep every ballot they receive. Test vector v06 pins the tiebreak, including a tie broken by `ballot_id`.
+
+### 4.6 Anchoring a ballot
+
+A poll whose `deadline` is on or after **2026-11-15T00:00:00Z** is an
+**anchored poll**: whether a ballot is in time is decided by the Bitcoin block
+that commits to its `ballot_id`. A poll with an
+earlier deadline is **clock-dated**: it is tallied as before, by `created_at`,
+and its tally says so (§8). The poll's bytes are the same either way.
+
+**The anchor.** A ballot is anchored by an [OC Stamp v1](https://github.com/orangecheck/oc-stamp-protocol)
+envelope (kind 30083) over the ballot:
+
+- `content.hash` = `"sha256:" || ballot_id`. The stamped bytes are the ballot's
+  canonical bytes with `sig.value` emptied, the bytes `ballot_id` hashes (§7.2).
+- `content.length` = the length of those bytes; `content.mime` =
+  `application/vnd.oc-vote.ballot+json`.
+- Any address may sign the stamp: the voter, the poll's creator, or anyone. The
+  stamp proves only that `ballot_id` existed before its anchor block; who signed
+  it says nothing about the ballot.
+
+Stamps over a ballot are found with
+`REQ { "kinds": [30083], "#t": ["sha256:<ballot_id>"] }` (OC Stamp §7.1).
+
+**Anchor height.** `anchor_height(b)` is the lowest block height among the
+stamps over `b` whose OpenTimestamps anchor the tallier verified itself. A stamp
+counts toward it only if:
+
+- its id reconstructs (OC Stamp §8.1 step 3);
+- its `content.hash`, read from the rebuilt stamp, equals
+  `"sha256:" || ballot_id(b)`. The tallier MUST check this: the `#t` tag that
+  found the stamp is relay metadata, outside the stamp id. `content.length` and
+  `content.mime` do not bear on priority;
+- its proof walks from that id to a Bitcoin attestation whose block header the
+  tallier checked itself (OC Stamp §6.3, §7.2 step 2). The height is that of
+  the earliest such attestation in the proof, never a declared `block_height`
+  that disagrees.
+
+A tallier MUST query several relays and keep every stamp over a ballot that any
+of them returns, never one per ballot or one per `d` tag: several stamps can
+cover one ballot, and copies of one stamp carry different proofs as calendars
+upgrade them. It takes the lowest height it verified across all of them, as
+OC Stamp §7.2 does. The stamp's own signature (OC Stamp §8.1 step 4) does not
+bear on priority, and a tallier MAY skip it. A ballot with no such stamp has no
+anchor height.
+
+An anchor the tallier could not check, because a block header could not be
+read, is not a missing anchor. Until it can check every stamp it holds, a
+tallier MUST NOT produce a final tally.
+
+**What the anchor decides.** Whether a ballot's bytes existed in time, and
+nothing else. When the ballot was published does not bear on it.
+
+**Close.** `H_close` is the greatest block height whose `median_time_past` ≤
+`deadline` (§0), the block §3.3 resolves for `snapshot_block: "deadline"`. It is
+known once a block whose `median_time_past` is after `deadline` exists; until
+then it is `none`. `G` is 36 blocks, about six hours, for calendar aggregation
+and block inclusion.
+
+- A final tally of an anchored poll counts a ballot only if
+  `anchor_height(b) ≤ H_close + G`; any other ballot is dropped with
+  `E_NOT_ANCHORED`.
+- The tally is final only once `H_close` is known and the tallier's chain tip
+  is at least `H_close + G + 6`. Before that it is **provisional** (§8): it
+  counts every ballot that passes the other checks, anchored or not, and says
+  how many of them are not yet anchored at or below `H_close + G`.
+
+**How late a ballot can count.** `median_time_past` is the median of the last
+eleven block times, so it trails the clock by about six blocks: `H_close` is
+usually mined about an hour after `deadline`. A ballot dated at or before
+`deadline` (§4.3) but cast after it can therefore still be anchored at or below
+`H_close + G` and count.
+
+**Who anchors.**
+
+- A voter's client SHOULD stamp each ballot it publishes, submit the stamp id to
+  at least two calendars (OC Stamp §6.1), publish the stamp, and republish it
+  once upgraded (OC Stamp §7.2). As the deadline nears it SHOULD tell its voter
+  when their ballot has no confirmed anchor yet.
+- Anyone may anchor any ballot they can see. **vote.ochk.io runs a convenience
+  anchorer** that stamps every ballot it observes for an open anchored poll and
+  publishes the stamps. It is named here because a voter may rely on it for
+  liveness; it is never required, anyone can run another, and a tally depends
+  only on the anchors, not on who made them.
+- The OpenTimestamps calendars are trusted for liveness only: they can delay a
+  proof, not backdate one (OC Stamp §11.3).
 
 ## 5. Weight modes
 
@@ -325,7 +412,7 @@ event.content = canonical_bytes(reveal_object)
 
 Given a secret-mode ballot and the reveal_sk, the tallier:
 
-1. Verifies the reveal (§10.3): its BIP-322 signature against the poll's `creator`, and that `x25519_base(reveal_sk) == poll.reveal_pk`. A reveal that fails either check is not a reveal, and the poll stays `awaiting reveal` (§6.5).
+1. Verifies the reveal (§10.3): its BIP-322 signature against the poll's `creator`, that `x25519_base(reveal_sk) == poll.reveal_pk`, and that the reveal is not premature. A reveal that fails any check is not a reveal, and the poll stays `awaiting reveal` (§6.5).
 2. Derives `device_sk = reveal_sk` and runs OC Lock §4.3 decryption on `ballot.secret.envelope` to recover the plaintext option id.
 3. Recomputes `commit` per §4.4 and compares to `ballot.secret.commit`. Rejects on mismatch (`E_COMMIT_MISMATCH`).
 4. Substitutes the decrypted option id into the ballot for tally purposes.
@@ -406,17 +493,27 @@ age_days(u, H) := max(0, floor((H - u.confirmed_height) * 600 / 86400))
 ## 8. Tally algorithm
 
 ```
-function tally(poll, ballots[], utxos_at: (addr, H) -> UTXOSet, reveal_sk: optional):
+function tally(poll, ballots[], utxos_at: (addr, H) -> UTXOSet, reveal_sk: optional,
+               tip_height, close_height, anchor_height: (ballot_id) -> height | none):
+  # reveal_sk comes from a reveal accepted under §10.3, else None.
+  # close_height (H_close, none while unknown) and anchor_height are for an anchored poll only (§4.6).
   # 1. Drop unsignable / untrusted ballots
   if not verify_bip322(poll.creator, poll_id(poll), poll.sig.value):
     reject(E_BAD_SIG)             # §10.1
   if not is_iso8601_utc(poll.deadline): reject(E_WRONG_POLL)   # §3.3
+  anchored = instant(poll.deadline) >= instant("2026-11-15T00:00:00Z")   # §4.6
+  final = not anchored or (close_height is not none and tip_height >= close_height + G + 6)
+  head = { "basis": anchored ? "anchored" : "voter_clocks" }
+  if anchored: head.close_height = close_height          # null while none
+  in_time(b) = anchor_height(ballot_id(b)) is not none and
+               (close_height is none or anchor_height(ballot_id(b)) <= close_height + G)
   valid = []
   for b in ballots:
     if b.poll_id != poll.poll_id: continue
     if not is_mainnet(b.voter): continue      # §4.3
     if not is_iso8601_utc(b.created_at): continue              # §0, §4.3
     if instant(b.created_at) > instant(poll.deadline): continue
+    if anchored and final and not in_time(b): continue          # E_NOT_ANCHORED
     if not verify_bip322(b.voter, ballot_id(b), b.sig.value): continue
     if poll.mode == "secret":
       if b.secret == null: continue
@@ -432,44 +529,74 @@ function tally(poll, ballots[], utxos_at: (addr, H) -> UTXOSet, reveal_sk: optio
     if k not in per_voter:
       per_voter[k] = b
     else:
-      per_voter[k] = choose_by_tiebreak(per_voter[k], b, poll.tiebreak)
+      per_voter[k] = choose_by_tiebreak(per_voter[k], b, poll.tiebreak, anchored)
+  option_of = { voter: b.option for voter, b in per_voter }
 
   # 3. Reveal if secret-mode
   if poll.mode == "secret":
     if reveal_sk is None:
-      return { "state": "awaiting_reveal" }
+      return head + { "state": "awaiting_reveal" }
     for voter, b in per_voter:     # the de-duplicated ballot, never another
       try:
         option = unseal_and_verify_commit(b.secret, reveal_sk, voter, poll.poll_id)
         if option != "withdraw" and option not in [o.id for o in poll.options]:
           raise E_UNKNOWN_OPTION
-        b.option = option
+        option_of[voter] = option
       except:
         del per_voter[voter]   # E_COMMIT_MISMATCH / E_UNKNOWN_OPTION
 
   # 4. Compute snapshot block
   H = resolve_snapshot(poll.snapshot_block, poll.deadline)
+  if H is none or tip_height - H + 1 < 6:
+    return head + { "state": "deferred", "code": "E_REORG" }   # §10.5
 
   # 5. Sum weights per option
   tallies = { o.id: 0 for o in poll.options }
   turnout = { "voters": 0, "weight": 0 }
   for voter, b in per_voter:
-    if b.option == "withdraw": continue
-    if b.option not in tallies: continue
+    option = option_of[voter]
+    if option == "withdraw": continue
+    if option not in tallies: continue
     U = utxos_at(voter, H)
     w = weight_for_mode(poll.weight_mode, poll.weight_params, poll.min_sats, poll.min_days, U, H)
     if w == 0: continue
-    tallies[b.option] += w
+    tallies[option] += w
     turnout.voters += 1
     turnout.weight += w
 
-  return {
-    "state": "tallied",
+  result = head + {
+    "state": final ? "tallied" : "provisional",
     "snapshot_block": H,
     "turnout": turnout,
-    "tallies": tallies
+    "tallies": tallies,
+    "counted": sorted([ballot_id(b) for voter, b in per_voter])
   }
+  if not final:
+    result.unanchored = count([b for voter, b in per_voter if not in_time(b)])
+  return result
 ```
+
+`basis` says what decided whether a ballot was in time: `"anchored"` for an
+anchored poll (§4.6), `"voter_clocks"` for a clock-dated poll, whose ballots are
+dated by the voters' own clocks. Every result carries it, `awaiting_reveal` and
+`deferred` included, and every result for an anchored poll also carries
+`close_height` (`null` while `H_close` is `none`). A client MUST show a
+`"voter_clocks"` tally as dated by the voters, and a `"provisional"` tally as
+not yet final. A secret-mode anchored poll is never provisional: its reveal is
+accepted only once the tally can be final (§10.3), so until then it is
+`awaiting_reveal`.
+
+`counted` lists the `ballot_id` of the ballot that stood for each voter after
+step 3, withdrawals and ballots that weigh zero included, as lowercase hex in
+ascending order.
+`unanchored`, in a provisional tally, is how many of those have no anchor at or
+below `H_close + G` yet (no anchor at all while `H_close` is `none`).
+
+A tally covers the ballots its tallier found. A ballot found later counts in a
+later tally under the same rules. A client that shows an earlier tally SHOULD
+show such a ballot apart from it, as surfaced after that tally, and MUST NOT
+fold it into that tally's figures. `counted` records what one tally saw; it
+never excludes a ballot from another tally, whoever publishes it.
 
 The plaintext for a voter MUST come from unsealing that voter's entry in
 `per_voter` — the ballot that passed step 1 and won step 2. A tallier MUST
@@ -485,9 +612,16 @@ and whose `sig` verifies (§10.1), and the reveal is one that satisfies §6.4
 and §10.3. Event recency is not a selection rule: anyone can publish under
 any `d` tag with any `created_at`.
 
-`choose_by_tiebreak(a, b, t)`:
-- If `t == "latest"`: pick the ballot with the later `created_at` instant. On ties, pick greater `ballot_id` lexicographically.
-- If `t == "first"`: pick the ballot with the earlier `created_at` instant. On ties, pick lesser `ballot_id` lexicographically.
+`choose_by_tiebreak(a, b, t, anchored)` orders a voter's ballots by the key
+`(anchor_height, instant(created_at), ballot_id)` in an anchored poll, and by
+`(instant(created_at), ballot_id)` in a clock-dated one. In a provisional tally
+an unanchored ballot's `anchor_height` sorts after every height.
+- If `t == "latest"`: pick the ballot with the greater key.
+- If `t == "first"`: pick the ballot with the lesser key.
+
+In an anchored poll the block that anchored a ballot outranks its `created_at`:
+under `first`, a ballot dated earlier but anchored later does not displace the
+one anchored first.
 
 Two conforming implementations running the same tally on the same inputs MUST produce byte-identical output when serialized canonically.
 
@@ -502,7 +636,8 @@ Two conforming implementations running the same tally on the same inputs MUST pr
 | `E_COMMIT_MISMATCH` | Revealed option does not match ballot's `secret.commit`. |
 | `E_BELOW_THRESHOLD` | Voter's qualifying sats/days below `min_sats`/`min_days`. Contributes zero weight (not an error per se — a status). |
 | `E_NO_REVEAL` | Secret-mode poll past deadline with no reveal event — state is `awaiting_reveal`. |
-| `E_REORG` | Snapshot block has fewer than 6 confirmations at tally time. Tally MUST be deferred. |
+| `E_NOT_ANCHORED` | A ballot in an anchored poll has no anchor at or below `H_close + G` (§4.6). It is dropped from a final tally. |
+| `E_REORG` | Snapshot block is not yet known or has fewer than 6 confirmations at tally time. The tally is deferred (§8). |
 | `E_UNSUPPORTED_MODE` | Client does not implement `poll.weight_mode`. |
 
 ## 10. Security-relevant requirements
@@ -511,11 +646,12 @@ Normative compliance conditions for correctness:
 
 1. **Verify every signature.** A ballot whose `sig.value` fails BIP-322 verification against `voter` MUST be dropped. A poll whose `sig.value` fails verification against `creator` MUST be rejected.
 2. **Verify `ballot_id` before signing.** The signer MUST compute `ballot_id` from the canonical serialization and confirm byte-equality with the input to BIP-322 before producing `sig.value`.
-3. **Reject premature and mismatched reveals.** A tallier MUST NOT accept a reveal while its own clock reads before the poll's `deadline`. The reveal's `revealed_at` is the creator's statement and does not decide this. A tallier MUST also reject a reveal whose `reveal_sk` is not the X25519 secret key for the poll's `reveal_pk` (SECURITY Scenario 13).
+3. **Reject premature and mismatched reveals.** For an anchored poll (§4.6), a tallier MUST NOT accept a reveal until its chain tip is at least `H_close + G + 6`, and never while `H_close` is `none`. For a clock-dated poll, it MUST NOT accept one while its own clock reads before the poll's `deadline`. The reveal's `revealed_at` is the creator's statement and decides neither. A tallier MUST also reject a reveal whose `reveal_sk` is not the X25519 secret key for the poll's `reveal_pk` (SECURITY Scenario 13).
 4. **Reject polls past deadline.** Clients MUST NOT accept ballots for a poll whose `deadline` has passed at publication time.
-5. **Refuse double-tally without reorg protection.** Tallies MUST be deferred if the snapshot block has fewer than 6 confirmations at tally time.
+5. **Refuse double-tally without reorg protection.** Tallies MUST be deferred if the snapshot block is not yet known or has fewer than 6 confirmations at tally time.
 6. **Canonicalize identically.** Two conforming implementations MUST produce byte-identical canonical bytes for the same object.
 7. **Never reveal partial tallies of a secret-mode poll.** Clients MUST NOT decrypt or surface individual ballot choices before a valid reveal event exists.
+8. **Count only anchored ballots in a final tally of an anchored poll.** A final tally counts a ballot only if its anchor, verified by the tallier against Bitcoin block headers, is at or below `H_close + G`, and is produced only once the chain tip is at least `H_close + G + 6` (§4.6). Before that a tally is labelled provisional.
 
 See [`SECURITY.md`](./SECURITY.md) for threat model, caveats, and reporting channel.
 
@@ -560,7 +696,11 @@ A client is OC Vote v0 compliant if and only if:
 - [ ] Implements `one_per_address`, `sats`, and `sats_days` weight modes per §5
 - [ ] Enforces `min_sats` / `min_days` thresholds
 - [ ] Correctly de-duplicates per voter per §8 tiebreak rules
-- [ ] Defers tally when snapshot has < 6 confirmations
+- [ ] Defers tally while the snapshot block is unknown or has < 6 confirmations
+- [ ] In an anchored poll, verifies ballot anchors against block headers, counts only ballots anchored at or below `H_close + G` in a final tally, and labels a tally provisional until the tip reaches `H_close + G + 6` (§4.6)
+- [ ] In an anchored poll, keeps every stamp over each ballot from every relay, checks each rebuilt stamp's `content.hash` against `ballot_id`, takes the lowest anchor it verified, and produces no final tally while any anchor cannot be checked (§4.6)
+- [ ] Labels a clock-dated tally as dated by the voters' own clocks, and reports `basis` on every result (§8)
+- [ ] Lists the ballots a tally counted, and shows a ballot found after a tally apart from it (§8)
 - [ ] Refuses to reveal or display partial secret-mode tallies before a valid reveal event
 - [ ] Verifies `secret.commit` matches the revealed option at tally time
 - [ ] Produces test-vector-identical output for the fixtures in [`test-vectors/`](./test-vectors/)

@@ -23,19 +23,19 @@ OC Vote owns three Nostr kinds — `30080` (poll), `30081` (ballot), `30082` (re
 
 - **Replacement.** Polls are addressable events under `d = oc-vote:poll:<poll_id>`. The `poll_id` is the SHA-256 of the canonical poll bytes, so re-publishing under the same `d` is structurally impossible — any change of a poll byte produces a different `id` and therefore a different `d`. Polls are de-facto immutable once published.
 - **Revocation.** This spec does **not** define a poll-revocation envelope, kind, tag, or canonical-message field. A poll has consumers — the ballots cast against it — and silently un-publishing the poll would orphan every ballot that references it.
-- **Closing early.** There is no close-early primitive, for either mode: a poll runs to `deadline`. Talliers do not accept a reveal until their own clock passes `deadline` (`SPEC.md` §10.3), so a reveal published earlier closes nothing; it only lets anyone read the choices already cast while voting is still open. Creators SHOULD NOT publish the reveal before `deadline`.
-- **Deadline expiry.** When `now > deadline`, the tally is final by spec. Late ballots are dropped (§3 / §5).
+- **Closing early.** There is no close-early primitive, for either mode: a poll runs to `deadline`. Talliers do not accept a reveal before the poll closes (`SPEC.md` §10.3: for an anchored poll, until their chain tip reaches `H_close + G + 6`; for a clock-dated poll, until their own clock passes `deadline`), so a reveal published earlier closes nothing; it only lets anyone read the choices already cast while voting is still open. Creators SHOULD NOT publish the reveal before `deadline`.
+- **Deadline expiry.** For an anchored poll (`SPEC.md` §4.6, deadline on or after 2026-11-15T00:00:00Z) the tally is provisional until the tallier's chain tip reaches `H_close + G + 6`, then final, counting only ballots anchored at or below `H_close + G`. A clock-dated poll's tally is final once `deadline` passes, and is shown as dated by the voters' own clocks (`SPEC.md` §8).
 - **Out-of-protocol controls.** A creator MAY hide a poll from a reference dashboard or publish a NIP-09 deletion request; neither affects the canonical tally and verifiers MUST ignore both.
 
 ### 1.2 Ballot (kind 30081)
 
 - **Re-voting.** Ballots are addressable events under `d = oc-vote:ballot:<poll_id>:<voter>`. A voter MAY publish a new ballot for the same poll any number of times before `deadline`. Each ballot is its own Nostr event under its own key, so relays keep the earlier ones too (`SPEC.md` §4.5); which one counts is governed by `tiebreak` (`SPEC.md` §8):
-  - `tiebreak: latest` — the highest-`created_at` ballot ≤ `deadline` wins.
-  - `tiebreak: first` — the lowest-`created_at` ballot ≤ `deadline` wins. Talliers MUST query multiple relays and keep every ballot they receive, because a client that reuses one Nostr key lets a relay discard older versions (`SPEC.md` §4.5).
+  - `tiebreak: latest` — the latest ballot wins: in an anchored poll the one anchored in the highest block, then by `created_at`; in a clock-dated poll the highest `created_at` ≤ `deadline`.
+  - `tiebreak: first` — the earliest ballot wins: in an anchored poll the one anchored in the lowest block, then by `created_at`; in a clock-dated poll the lowest `created_at` ≤ `deadline`. Talliers MUST query multiple relays and keep every ballot they receive, because a client that reuses one Nostr key lets a relay discard older versions (`SPEC.md` §4.5).
   - Equal `created_at`: the greater `ballot_id` wins under `latest`, the lesser under `first`.
 - **Revocation.** This spec does **not** define a ballot-revocation envelope. A new ballot is the substitute: a voter who wants to change or "unvote" SHOULD publish a new ballot whose `option` reflects their final choice (`withdraw` to count for nothing). There is no protocol-level "abstain after voting" primitive — abstention is encoded by *not voting*.
 - **Withdrawal of bond.** The voter's stake is whatever the weight mode evaluates against the voter's UTXOs at `snapshot_block`. A voter who spends those UTXOs before `snapshot_block` reduces or zeroes their weight in the final tally. This is permitted by Bitcoin and never blocked by this spec.
-- **Post-deadline ballots.** Talliers MUST discard ballots with `created_at > deadline`. Republishing under the same `d` after `deadline` does nothing; the tally has frozen.
+- **Post-deadline ballots.** Talliers MUST discard ballots with `created_at > deadline`, and in a final tally of an anchored poll every ballot not anchored at or below `H_close + G` (`SPEC.md` §4.6). A ballot dated at or before `deadline` but cast after it can still count if it is anchored by `H_close + G`; `SPEC.md` §4.6 gives the arithmetic.
 - **Out-of-protocol controls.** A voter MAY hide a ballot from a reference dashboard or publish a NIP-09 deletion request; neither affects whether the ballot is counted. Talliers MUST ignore both signals.
 
 ### 1.3 Reveal (kind 30082)
@@ -52,7 +52,7 @@ Every weight mode in `SPEC.md` §4 reads UTXOs at `snapshot_block`. Spending tho
 
 | Implementation MUST | Implementation MUST NOT |
 |---|---|
-| Treat the highest- or lowest-`created_at` ballot per `(poll, voter)` (per `tiebreak`) as the voter's final choice. | Define or honor a "ballot revocation" envelope kind, tag, or field beyond NIP-33 replacement. |
-| Discard ballots whose `created_at > deadline` regardless of when they were published. | Define or honor a "poll revocation" envelope kind. Polls have ballot consumers; orphaning is not a feature. |
+| Treat the latest or earliest ballot per `(poll, voter)` (per `tiebreak`, ordered by anchor height first in an anchored poll) as the voter's final choice. | Define or honor a "ballot revocation" envelope kind, tag, or field beyond NIP-33 replacement. |
+| Discard ballots whose `created_at > deadline` regardless of when they were published, and in an anchored poll's final tally those not anchored by `H_close + G`. | Define or honor a "poll revocation" envelope kind. Polls have ballot consumers; orphaning is not a feature. |
 | Treat reveals as one-shot — the secret cannot be unpublished. | Treat dashboard-local hide flags or NIP-09 deletion-request events as protocol signals. |
 | Re-evaluate `bond.sats` / `bond.days` thresholds against live state at tally time and apply the spec's bond-failure errors. | Suppress evaluation of a poll/ballot because its publisher requested hiding or deletion. |

@@ -34,6 +34,7 @@ This document covers the **OC Vote v0 protocol specification** in this repositor
 - **Sender anonymity.** Every ballot is plaintext-signed by a Bitcoin address; the address is public. Pseudonymity requires voting from a fresh address, which typically has no stake and so passes no threshold.
 - **Metadata privacy.** Poll questions, option labels, creator addresses, voter addresses, deadlines, and snapshot blocks are all plaintext. If any of these are sensitive, do not publish the poll.
 - **Censorship-resistance of Nostr relays.** A hostile relay set can refuse to store or serve specific polls or ballots. Mitigation: multi-relay publication, self-hosted relays, or out-of-band transport (the objects are self-contained JSON).
+- **A ballot cast just after the deadline, in an anchored poll's grace window.** `median_time_past` trails the clock by about six blocks, so a ballot dated at or before `deadline` but cast after it can still be anchored at or below `H_close + G` (`G` = 36) and count (`SPEC.md` §4.6). In a public poll that voter can first see more of the running tally. The trade is deliberate: an honest ballot cast just before the deadline still anchors in time.
 - **Claim to replace legal voting.** OC Vote is a cryptographic signal for voluntary coordination. It makes no claim to sovereign-election properties (accessibility, audit under adversarial oversight, legal identity binding, etc.).
 
 ### Assumptions the protocol makes
@@ -42,6 +43,7 @@ This document covers the **OC Vote v0 protocol specification** in this repositor
 - **BIP-322 is implemented correctly** by both signing and verifying clients. Pin verifiers to versions known to handle P2WPKH, P2TR, P2WSH, and P2PKH.
 - **Voters' wallets isolate signing keys.** BIP-322 exposes only a signed message, not the private key. A compromised wallet compromises the voter, not the tally.
 - **Randomness is strong.** `reveal_sk` is generated via `crypto.getRandomValues` / platform CSPRNG. Weak randomness on a secret-mode poll creator compromises the reveal key and, by extension, ballot secrecy.
+- **OpenTimestamps calendars and anchorers are trusted for liveness only.** They can delay or withhold an anchor, never backdate one. A voter's own client, vote.ochk.io's convenience anchorer, or anyone else can anchor a ballot (`SPEC.md` §4.6).
 - **Bitcoin full-node data is trustworthy or independently verifiable.** The tally depends on UTXO state at a specific block height. Taliers using third-party UTXO APIs inherit those APIs' trust. Self-hosting a node eliminates this.
 
 ## Normative compliance requirements
@@ -54,7 +56,7 @@ These are cryptographic correctness conditions that conforming implementations M
 4. **Never reveal or display partial tallies for a secret-mode poll** before a valid reveal event exists.
 5. **Verify `secret.commit`** at reveal time. Silently accepting a revealed option that doesn't match the commitment allows a malicious reveal ceremony to rewrite history.
 6. **Refuse polls whose `weight_mode` is unsupported.** Partial or fudged support is worse than rejection — it produces wrong tallies.
-7. **Enforce `poll.deadline`.** Ballots with `created_at > deadline` MUST be discarded.
+7. **Enforce `poll.deadline`.** Ballots with `created_at > deadline` MUST be discarded. In an anchored poll, a final tally counts only ballots anchored at or below `H_close + G`, verified against block headers (`SPEC.md` §4.6, §10.8).
 
 ## Known cryptographic caveats
 

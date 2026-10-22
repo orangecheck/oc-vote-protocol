@@ -4,6 +4,58 @@ All notable changes to the OC Vote protocol and reference SDK.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased] — anchored ballots (polls with a deadline on or after 2026-11-15T00:00:00Z)
+
+No canonicalization or signature change: polls, ballots and reveals keep their
+bytes and ids.
+
+- **§4.6 (new).** In an anchored poll, whether a ballot is in time is decided by
+  the Bitcoin block that anchors its `ballot_id`, through an OC Stamp over the
+  ballot and its OpenTimestamps proof. The anchor decides that and nothing
+  else. A final tally counts only ballots anchored at or below `H_close + G`
+  (`G` = 36 blocks), and is final only once `H_close` is known and the chain
+  tip reaches `H_close + G + 6`; before that it is provisional. Talliers MUST
+  check each rebuilt stamp's `content.hash` against `"sha256:" || ballot_id`,
+  and MUST keep every stamp over a ballot from every relay they query, taking
+  the lowest verified anchor, from the earliest attestation each proof walks to
+  a checked header. An anchor that could not be checked is not a missing one:
+  no final tally until it can be. Any address may sign the stamp. Voter clients
+  SHOULD anchor their ballots, and vote.ochk.io runs a convenience anchorer
+  anyone can replace. The section states how late a ballot can still count:
+  `median_time_past` trails the clock by about six blocks, so up to
+  `H_close + G`.
+- **§0, §3.3.** §0 defines `instant(t)`. `H_close` is the greatest block height whose
+  `median_time_past` ≤ `deadline`, and `none` until a later block's
+  `median_time_past` passes `deadline`. §3.3 now names it for
+  `snapshot_block: "deadline"`, used once it has 6 confirmations.
+- **§8.** The tally takes the chain tip, `H_close` and anchor heights. Every
+  result carries `basis` (`"anchored"` or `"voter_clocks"`), and an anchored
+  poll's results `close_height`. Tallies list the ballots they counted in
+  `counted`; a provisional tally reports in `unanchored` how many of those are
+  not yet anchored in time. A ballot found after a tally is shown apart from
+  it, and `counted` excludes nothing from another tally. A tally whose snapshot
+  block is unknown or has fewer than 6 confirmations returns
+  `{ "state": "deferred", "code": "E_REORG" }`. `choose_by_tiebreak` orders an
+  anchored poll's ballots by anchor height first. Step 3 keeps each voter's
+  revealed option apart from the ballot, so `ballot_id` still names the ballot
+  as received.
+- **§9, §10.5.** New error `E_NOT_ANCHORED`. `E_REORG` also covers a snapshot
+  block that is not yet known.
+- **§10.3, §10.8.** An anchored poll's reveal is accepted only once the tip
+  reaches `H_close + G + 6`, never while `H_close` is `none`. Final tallies count
+  only anchored ballots.
+- **§15.** Checklist lines for stamp copies and `content.hash`, `basis`,
+  `counted`, and ballots found after a tally.
+- **`LIFECYCLE.md`, `SECURITY.md`, `PROTOCOL.md`, `README.md`.** Same rules,
+  how late a ballot can count, the liveness assumption on calendars and
+  anchorers, and `basis` and `counted` in the walkthrough's results.
+- **Vectors.** v01–v07 results gain `"basis": "voter_clocks"` and `counted`
+  (v05's pre-reveal result gains `basis`); their counts do not change. New
+  v08–v15 cover anchored polls, an open anchored poll, and a deferred tally;
+  v16 pins the order of `counted`.
+  `scripts/validate-vectors.mjs` checks every result has `basis` and a sorted
+  `counted` drawn from the vector's ballots.
+
 ## [Unreleased] — 2026-10-22 — errata: times are iso8601_utc; reveals are checked by the tallier's clock and the poll's key
 
 **Errata.** No canonicalization or signature change. Every vector keeps its

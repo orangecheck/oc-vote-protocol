@@ -150,6 +150,20 @@ for (const name of files) {
         }
     }
 
+    // SPEC §8: every result carries basis; counted is sorted and names input ballots.
+    const results = expected?.tally_with_utxos ?? {};
+    for (const key of ['expected_result', 'expected_result_pre_reveal', 'expected_result_post_reveal']) {
+        const r = results[key];
+        if (!r) continue;
+        if (r.basis !== 'anchored' && r.basis !== 'voter_clocks') issues.push(`${key} has no basis`);
+        if (Array.isArray(r.counted)) {
+            if (r.counted.some((id) => !expected.ballot_ids?.includes(id))) {
+                issues.push(`${key}.counted names a ballot not in the inputs`);
+            }
+            if (r.counted.join() !== [...r.counted].sort().join()) issues.push(`${key}.counted is not sorted`);
+        }
+    }
+
     if (issues.length) {
         console.error(`✗ ${name}`);
         for (const i of issues) console.error(`  - ${i}`);
