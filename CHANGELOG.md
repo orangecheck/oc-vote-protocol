@@ -4,6 +4,32 @@ All notable changes to the OC Vote protocol and reference SDK.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased] — 2026-10-22 — errata: times are iso8601_utc; reveals are checked by the tallier's clock and the poll's key
+
+**Errata.** No canonicalization or signature change. Every vector keeps its
+tally; v05's ids change (below).
+
+- **§3.3, §4.3, §8.** A poll's `deadline` and a ballot's `created_at` MUST be
+  `iso8601_utc` (§0). The tally drops a ballot whose `created_at` is not,
+  including a time with no zone, an offset, or a date that does not exist, and
+  compares instants. Every tallier then reads the same times from the same
+  inputs, as §8 requires.
+- **§6.4 step 1, §10.3.** A tallier accepts a reveal only once its own clock
+  reads at or after `deadline`; the reveal's `revealed_at` does not decide. The
+  tallier MUST also check that `reveal_sk` is the X25519 secret key for the
+  poll's `reveal_pk`, which SECURITY Scenario 13 already required.
+- **`LIFECYCLE.md` §1.1.** A reveal published before `deadline` no longer
+  "closes" a secret poll early: no poll closes before `deadline`, and creators
+  SHOULD NOT reveal before it.
+- **v05.** Its `reveal_pk` was a placeholder that no `reveal_sk` matches. It is
+  now the X25519 public key of the vector's `reveal_sk`, so `poll_id`,
+  `ballot_id`, `commit` and `reveal_id` change. The tally does not.
+- **New vector v07.** Ballots dated `late-15`, with no zone, and on 31 April are
+  dropped, whatever the order or the tallier's time zone.
+- **`scripts/validate-vectors.mjs`** checks a secret vector's reveal key.
+
+Reference implementation: `@orangecheck/vote-core` 1.6.0.
+
 ## [Unreleased] — 2026-10-21 — reference relay set
 
 - **§3.4** names the relays the reference client now uses. `relay.snort.social` and `offchain.pub` left it on 2026-10-21: snort kept none of the family events it accepted, and offchain refused events signed by fresh keys. `relay.damus.io` and `nostr.oxtr.dev` joined. Non-normative; nothing a client MUST do changes.

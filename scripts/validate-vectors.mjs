@@ -11,7 +11,7 @@
 // Run: node scripts/validate-vectors.mjs
 // Exits non-zero if any vector fails.
 
-import { createHash } from 'node:crypto';
+import { createHash, createPrivateKey, createPublicKey } from 'node:crypto';
 import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -65,6 +65,13 @@ function idOf(obj) {
     const clone = structuredClone(obj);
     if (clone.sig) clone.sig.value = '';
     return sha256Hex(canonicalBytes(clone));
+}
+
+// X25519 public key of a raw 32-byte secret key, through its PKCS#8 form (RFC 8410).
+function x25519PublicHex(skHex) {
+    const der = Buffer.concat([Buffer.from('302e020100300506032b656e04220420', 'hex'), Buffer.from(skHex, 'hex')]);
+    const spki = createPublicKey(createPrivateKey({ key: der, format: 'der', type: 'pkcs8' }));
+    return spki.export({ type: 'spki', format: 'der' }).subarray(-32).toString('hex');
 }
 
 // ---- Validator -----------------------------------------------------------
@@ -126,6 +133,13 @@ for (const name of files) {
                     `ballot_id #${i} drift: got ${got}, expected ${expId}`
                 );
             }
+        }
+    }
+
+    // SPEC §10.3, SECURITY Scenario 13: the reveal key must open what was sealed to reveal_pk.
+    if (inputs?.reveal && inputs?.poll?.mode === 'secret') {
+        if (x25519PublicHex(inputs.reveal.reveal_sk) !== inputs.poll.reveal_pk) {
+            issues.push("reveal_sk is not the X25519 key for the poll's reveal_pk");
         }
     }
 

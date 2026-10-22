@@ -23,7 +23,7 @@ OC Vote owns three Nostr kinds — `30080` (poll), `30081` (ballot), `30082` (re
 
 - **Replacement.** Polls are addressable events under `d = oc-vote:poll:<poll_id>`. The `poll_id` is the SHA-256 of the canonical poll bytes, so re-publishing under the same `d` is structurally impossible — any change of a poll byte produces a different `id` and therefore a different `d`. Polls are de-facto immutable once published.
 - **Revocation.** This spec does **not** define a poll-revocation envelope, kind, tag, or canonical-message field. A poll has consumers — the ballots cast against it — and silently un-publishing the poll would orphan every ballot that references it.
-- **Closing early.** A creator MAY end a `secret`-mode poll early by publishing the `reveal` event (kind 30082) before `deadline`. Talliers MUST still discard ballots whose `created_at > deadline`; an early reveal does not shorten the deadline, it only unseals the ballots already cast. There is no equivalent "close early" primitive for `public`-mode polls — `public` polls run to `deadline` and that is the sole stop condition.
+- **Closing early.** There is no close-early primitive, for either mode: a poll runs to `deadline`. Talliers do not accept a reveal until their own clock passes `deadline` (`SPEC.md` §10.3), so a reveal published earlier closes nothing; it only lets anyone read the choices already cast while voting is still open. Creators SHOULD NOT publish the reveal before `deadline`.
 - **Deadline expiry.** When `now > deadline`, the tally is final by spec. Late ballots are dropped (§3 / §5).
 - **Out-of-protocol controls.** A creator MAY hide a poll from a reference dashboard or publish a NIP-09 deletion request; neither affects the canonical tally and verifiers MUST ignore both.
 

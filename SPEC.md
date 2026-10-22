@@ -84,7 +84,7 @@ Equivalently: compute the canonical serialization with `sig.value` set to the em
 - `creator` — MUST be a valid Bitcoin mainnet address (P2WPKH, P2TR, P2WSH, or P2PKH).
 - `question` — REQUIRED.
 - `options` — MUST contain at least 2 entries. Option ids MUST be unique within the poll. Reserved option id: `"withdraw"` (see §4.3).
-- `deadline` — MUST be strictly in the future at the time of publication.
+- `deadline` — MUST be an `iso8601_utc` string (§0), strictly in the future at the time of publication.
 - `snapshot_block` — integer (a specific block height known at poll creation) or the literal string `"deadline"` (deferred to the chain tip at `deadline`). In the deferred case, the tallier MUST use the block whose `median_time_past` is the greatest value `≤ deadline` and has ≥ 6 confirmations.
 - `weight_mode` — one of the canonical modes in §5, or a registered extension name (§11).
 - `weight_params` — shape is weight_mode-dependent. See §5.
@@ -170,7 +170,7 @@ nostr_sk := HKDF(ikm=poll_local_secret, salt="oc-vote/v0/nostr-key", info=poll_i
 - `secret`:
   - In `public` mode: MUST be `null`.
   - In `secret` mode: REQUIRED. `envelope` is a valid OC Lock v2 envelope addressed to the poll's `reveal_pk` (see §6). `commit` is a binding commitment so the voter cannot claim a different option at reveal time.
-- `created_at` — SHOULD be before `deadline`. Ballots with `created_at > deadline` are discarded by the tally.
+- `created_at` — MUST be an `iso8601_utc` string (§0), and SHOULD be before `deadline`. The tally discards a ballot whose `created_at` is not `iso8601_utc` (for example a time with no zone, an offset, or a date that does not exist), and one with `created_at > deadline`.
 - `sig` — BIP-322 signature by `voter` over `ballot_id`.
 
 ### 4.4 The commitment in secret mode
@@ -325,7 +325,7 @@ event.content = canonical_bytes(reveal_object)
 
 Given a secret-mode ballot and the reveal_sk, the tallier:
 
-1. Verifies the reveal object's BIP-322 signature against the poll's `creator`.
+1. Verifies the reveal (§10.3): its BIP-322 signature against the poll's `creator`, and that `x25519_base(reveal_sk) == poll.reveal_pk`. A reveal that fails either check is not a reveal, and the poll stays `awaiting reveal` (§6.5).
 2. Derives `device_sk = reveal_sk` and runs OC Lock §4.3 decryption on `ballot.secret.envelope` to recover the plaintext option id.
 3. Recomputes `commit` per §4.4 and compares to `ballot.secret.commit`. Rejects on mismatch (`E_COMMIT_MISMATCH`).
 4. Substitutes the decrypted option id into the ballot for tally purposes.
@@ -410,11 +410,13 @@ function tally(poll, ballots[], utxos_at: (addr, H) -> UTXOSet, reveal_sk: optio
   # 1. Drop unsignable / untrusted ballots
   if not verify_bip322(poll.creator, poll_id(poll), poll.sig.value):
     reject(E_BAD_SIG)             # §10.1
+  if not is_iso8601_utc(poll.deadline): reject(E_WRONG_POLL)   # §3.3
   valid = []
   for b in ballots:
     if b.poll_id != poll.poll_id: continue
     if not is_mainnet(b.voter): continue      # §4.3
-    if b.created_at > poll.deadline: continue
+    if not is_iso8601_utc(b.created_at): continue              # §0, §4.3
+    if instant(b.created_at) > instant(poll.deadline): continue
     if not verify_bip322(b.voter, ballot_id(b), b.sig.value): continue
     if poll.mode == "secret":
       if b.secret == null: continue
@@ -484,8 +486,8 @@ and §10.3. Event recency is not a selection rule: anyone can publish under
 any `d` tag with any `created_at`.
 
 `choose_by_tiebreak(a, b, t)`:
-- If `t == "latest"`: pick the ballot with greater `created_at`. On ties, pick greater `ballot_id` lexicographically.
-- If `t == "first"`: pick the ballot with lesser `created_at`. On ties, pick lesser `ballot_id` lexicographically.
+- If `t == "latest"`: pick the ballot with the later `created_at` instant. On ties, pick greater `ballot_id` lexicographically.
+- If `t == "first"`: pick the ballot with the earlier `created_at` instant. On ties, pick lesser `ballot_id` lexicographically.
 
 Two conforming implementations running the same tally on the same inputs MUST produce byte-identical output when serialized canonically.
 
@@ -509,7 +511,7 @@ Normative compliance conditions for correctness:
 
 1. **Verify every signature.** A ballot whose `sig.value` fails BIP-322 verification against `voter` MUST be dropped. A poll whose `sig.value` fails verification against `creator` MUST be rejected.
 2. **Verify `ballot_id` before signing.** The signer MUST compute `ballot_id` from the canonical serialization and confirm byte-equality with the input to BIP-322 before producing `sig.value`.
-3. **Reject stale reveals.** If a reveal event's `revealed_at` is before the poll's `deadline`, the reveal is premature and MUST be rejected by tallier implementations.
+3. **Reject premature and mismatched reveals.** A tallier MUST NOT accept a reveal while its own clock reads before the poll's `deadline`. The reveal's `revealed_at` is the creator's statement and does not decide this. A tallier MUST also reject a reveal whose `reveal_sk` is not the X25519 secret key for the poll's `reveal_pk` (SECURITY Scenario 13).
 4. **Reject polls past deadline.** Clients MUST NOT accept ballots for a poll whose `deadline` has passed at publication time.
 5. **Refuse double-tally without reorg protection.** Tallies MUST be deferred if the snapshot block has fewer than 6 confirmations at tally time.
 6. **Canonicalize identically.** Two conforming implementations MUST produce byte-identical canonical bytes for the same object.

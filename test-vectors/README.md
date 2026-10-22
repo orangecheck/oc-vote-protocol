@@ -37,7 +37,7 @@ Given the `inputs`, a compliant implementation MUST:
 1. Canonicalize each object (poll, ballot, reveal) per [`SPEC §7`](../SPEC.md#7-canonicalization). The bytes MUST equal the `*_canonical` strings.
 2. Compute each `*_id` as `SHA256(canonical_bytes_with_sig.value_emptied)` per §7.1 / §7.2 / §6.3.
 3. Run the tally function per [`SPEC §8`](../SPEC.md#8-tally-algorithm) against the provided `utxo_snapshot`. The output MUST equal `tally_with_utxos.expected_result` after canonical serialization.
-4. In secret-mode vectors, additionally verify every `secret.commit` matches `SHA256("oc-vote/v0/commit\npoll_id: …\nvoter: …\noption: …\n")`.
+4. In secret-mode vectors, additionally verify every `secret.commit` matches `SHA256("oc-vote/v0/commit\npoll_id: …\nvoter: …\noption: …\n")`, and that the reveal's `reveal_sk` is the X25519 secret key for the poll's `reveal_pk` (SPEC §10.3).
 
 If any of these diverge, the implementation is non-conformant. Typical bugs:
 
@@ -63,6 +63,7 @@ BIP-322 signatures in these vectors are **fake placeholders** (base64 of "ALICE-
 | [`v04-vote-change.json`](./v04-vote-change.json) | Same voter casts two ballots; `tiebreak: latest` picks the later one |
 | [`v05-secret-ballot.json`](./v05-secret-ballot.json) | Secret-mode ballot with `null` option pre-reveal + `commit`; reveal event; `awaiting_reveal` → `tallied` state transition |
 | [`v06-tiebreak-first.json`](./v06-tiebreak-first.json) | `tiebreak: first`; one voter, three ballots, two at the same earliest `created_at`, so the lesser `ballot_id` decides. Relays keep all three (SPEC §4.5); only the §8 tiebreak picks |
+| [`v07-ballot-times.json`](./v07-ballot-times.json) | `created_at` MUST be `iso8601_utc` (SPEC §4.3): one voter's ballot dated `late-15`, another voter's with no zone, a third's dated 31 April. All three are dropped, whatever the ballot order or the tallier's time zone |
 
 ## Ids at a glance
 
@@ -72,8 +73,9 @@ BIP-322 signatures in these vectors are **fake placeholders** (base64 of "ALICE-
 | v02 | `27373a17…57aa4` | `545838e3…18f3ea`, `b4c84b71…65f309`, `ed548b51…76edb9` | — |
 | v03 | `571e3615…44ec9` | `b61e2b30…8f3aa` | — |
 | v04 | `8e92e84a…a235d` | `ad5402c5…26ab6`, `d51c0445…65449f` | — |
-| v05 | `cc2769b4…20e04` | `57b6f290…15ed5` | `4db64f16…a8d5` |
+| v05 | `fb739a6c…c48e3` | `b13ed82e…282cb` | `7af2a7b3…f66da` |
 | v06 | `57f8363f…bd6d7` | `7b530d90…ab122`, `b69e5d6b…526c4`, `681e78f4…de5e6` | — |
+| v07 | `9c35081c…b2831` | `fe3a8990…71f8f`, `af6856f4…a6342`, `ef5f4504…0147d`, `785c751e…fd01d`, `69279368…c087f` | — |
 
 (Ids in this table are truncated; the vector files have full 64-char hex.)
 
