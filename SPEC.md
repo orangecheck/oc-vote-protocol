@@ -292,7 +292,14 @@ usually mined about an hour after `deadline`. A ballot dated at or before
   anchorer** that stamps every ballot it observes for an open anchored poll and
   publishes the stamps. It is named here because a voter may rely on it for
   liveness; it is never required, anyone can run another, and a tally depends
-  only on the anchors, not on who made them.
+  only on the anchors, not on who made them. It works within published limits,
+  per run (every ten minutes): at most 300 new stamps, shared round-robin across
+  polls, and at most 50 per poll, in the order it first saw the ballots (never
+  by a date a publisher chose); at most 50 polls read, chosen at random when
+  more are open. What a limit leaves waits for a later run, and every stamp it
+  made is upgraded and republished whatever the limits. Its health page says
+  when a limit left work, and voters' clients anchor their own ballots, as
+  above.
 - The OpenTimestamps calendars are trusted for liveness only: they can delay a
   proof, not backdate one (OC Stamp §11.3).
 

@@ -9,6 +9,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 No canonicalization or signature change: polls, ballots and reveals keep their
 bytes and ids.
 
+- **§4.6, who anchors.** The section states the convenience anchorer's limits
+  per run: at most 300 new stamps, round-robin across polls, at most 50 per
+  poll in the order it first saw the ballots, and at most 50 polls read. Stamps
+  it made are always upgraded. Voter clients anchor what falls outside them.
+
 - **§4.6 (new).** In an anchored poll, whether a ballot is in time is decided by
   the Bitcoin block that anchors its `ballot_id`, through an OC Stamp over the
   ballot and its OpenTimestamps proof. The anchor decides that and nothing
