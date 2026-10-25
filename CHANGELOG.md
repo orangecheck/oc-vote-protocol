@@ -9,6 +9,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 No canonicalization or signature change: polls, ballots and reveals keep their
 bytes and ids.
 
+- **§10 item 9.** A verifier of a ballot cast by an OC Agent takes `poll_id`
+  and `choice` from the ballot (or its reveal), never from the agent action's
+  `scope_exercised`.
 - **§7.** A poll, ballot or reveal nests at most 32 levels of objects and
   arrays, the object itself being level 1. One nested deeper is malformed: a
   verifier rejects it and a tally does not count it, so every tallier counts the

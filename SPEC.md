@@ -661,6 +661,7 @@ Normative compliance conditions for correctness:
 6. **Canonicalize identically.** Two conforming implementations MUST produce byte-identical canonical bytes for the same object.
 7. **Never reveal partial tallies of a secret-mode poll.** Clients MUST NOT decrypt or surface individual ballot choices before a valid reveal event exists.
 8. **Count only anchored ballots in a final tally of an anchored poll.** A final tally counts a ballot only if its anchor, verified by the tallier against Bitcoin block headers, is at or below `H_close + G`, and is produced only once the chain tip is at least `H_close + G + 6` (§4.6). Before that a tally is labelled provisional.
+9. **Read an agent's ballot from the ballot.** A verifier that accepts a ballot cast by an OC Agent under a `vote:cast` delegation MUST take `poll_id` from the ballot it verifies, and `choice` from the ballot or, for a secret ballot, from its reveal, never from the agent action's `scope_exercised` (oc-agent-protocol SPEC §8.3 step 12a).
 
 See [`SECURITY.md`](./SECURITY.md) for threat model, caveats, and reporting channel.
 
