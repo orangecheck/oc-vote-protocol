@@ -471,6 +471,8 @@ The canonical byte representation is required for computing all `*_id` values an
 - Strings: `\uXXXX` escapes only for control characters (U+0000–U+001F), `"` (U+0022), and `\` (U+005C). All other codepoints literal.
 - Final byte is LF (`0x0a`).
 
+A poll, ballot or reveal nests at most 32 levels of objects and arrays, the object itself being level 1. One nested deeper is malformed: a verifier MUST reject it, a tally MUST NOT count it, and a client MUST NOT treat it as a voter's standing ballot (vectors v17, v18).
+
 Reference: [RFC 8785 JSON Canonicalization Scheme](https://www.rfc-editor.org/rfc/rfc8785) with the additional constraint on `options[]` order.
 
 ### 7.1 Computing `poll_id`

@@ -9,6 +9,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 No canonicalization or signature change: polls, ballots and reveals keep their
 bytes and ids.
 
+- **§7.** A poll, ballot or reveal nests at most 32 levels of objects and
+  arrays, the object itself being level 1. One nested deeper is malformed: a
+  verifier rejects it and a tally does not count it, so every tallier counts the
+  same ballot for each voter. Vectors v17 (32 levels, counted) and v18 (33
+  levels, not counted; the voter's earlier ballot stands).
+  `@orangecheck/vote-core` 2.1.0 exports the limit as `MAX_NESTING_DEPTH`.
+
 - **§4.6, who anchors.** The section states the convenience anchorer's limits
   per run: at most 300 new stamps, round-robin across polls, at most 50 per
   poll in the order it first saw the ballots, and at most 50 polls read. Stamps

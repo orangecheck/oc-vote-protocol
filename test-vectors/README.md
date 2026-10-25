@@ -74,6 +74,8 @@ BIP-322 signatures in these vectors are **fake placeholders** (base64 of "ALICE-
 | [`v14-open-anchored-poll.json`](./v14-open-anchored-poll.json) | Anchored poll still open: `H_close` is `none`, so the tally is `provisional` with `close_height: null`, and `unanchored` counts the ballot with no anchor yet |
 | [`v15-deferred.json`](./v15-deferred.json) | `snapshot_block: "deadline"` at tip `H_close + 3`: the snapshot has 4 confirmations, so the result is `deferred` with `E_REORG`, and still carries `basis` and `close_height` |
 | [`v16-counted-order.json`](./v16-counted-order.json) | `counted` (SPEC §8) lists each voter's standing `ballot_id` as lowercase hex in ascending order: not input order, not voter order. A superseded ballot is not listed; a withdrawal and a ballot that weighs zero are |
+| [`v17-ballot-nested-32.json`](./v17-ballot-nested-32.json) | v04 with the later ballot nested 32 levels deep (SPEC §7), the most allowed: it counts |
+| [`v18-ballot-nested-33.json`](./v18-ballot-nested-33.json) | v04 with the later ballot nested 33 levels deep: malformed (SPEC §7), not counted, and the voter's earlier ballot stands |
 
 ## Ids at a glance
 
@@ -95,6 +97,8 @@ BIP-322 signatures in these vectors are **fake placeholders** (base64 of "ALICE-
 | v14 | `210e6ac1…d9de2` | `81ca4eb9…339a1`, `a85edb09…83681` | — |
 | v15 | `df538742…0bf54` | `eabeb2d3…15338` | — |
 | v16 | `5be35db7…15b46` | `97cfc4ae…e8008`, `9dff3555…3bfd4`, `03086c6c…d084e`, `097f3e0e…fae2b`, `f5e56afc…9022e` | — |
+| v17 | `8e92e84a…a235d` | `ad5402c5…26ab6`, `7f1339db…7d407` | — |
+| v18 | `8e92e84a…a235d` | `ad5402c5…26ab6`, `983a3ba9…4f54e` | — |
 
 (Ids in this table are truncated; the vector files have full 64-char hex.)
 
