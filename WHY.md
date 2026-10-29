@@ -305,4 +305,4 @@ The "content-addressed poll + replaceable-by-author ballot" design borrows shape
 
 ## Status
 
-v0 — spec-stable. Anything breaking before 1.0 increments the minor version.
+v0, still changing. The rule changes since 0.1.0 are listed under [Unreleased] in CHANGELOG.md and have no version yet. Anything breaking before 1.0 will increment the minor version when it is released.

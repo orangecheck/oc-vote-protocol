@@ -3,7 +3,7 @@
 **Sovereign signaling for the open web.**
 *Sats as weight. One ballot. Anyone tallies.*
 
-[![License](https://img.shields.io/badge/license-MIT-blue)](./LICENSE) [![Status](https://img.shields.io/badge/status-v0%20spec--stable-orange)](./CHANGELOG.md)
+[![License](https://img.shields.io/badge/license-MIT-blue)](./LICENSE) [![Status](https://img.shields.io/badge/status-v0%2C%20changing-orange)](./CHANGELOG.md)
 
 OC Vote is a protocol for running sybil-resistant, stake-weighted, offline-tallyable polls on the open internet — without a token, without a KYC vendor, without trusting a tallier. It completes the OrangeCheck family as the **legitimacy** primitive alongside OrangeCheck (sybil-resistant identity signal) and OC Lock (confidentiality to an identity).
 
@@ -126,7 +126,7 @@ That's the whole protocol. Everything else is encoding details. See [`WHY.md`](.
 
 ## Status
 
-**v0 — spec-stable.** Anything breaking before 1.0 increments the minor version and is called out in [`CHANGELOG.md`](./CHANGELOG.md).
+**v0, still changing.** The rule changes since 0.1.0, anchored ballots among them, are listed under [Unreleased] in [`CHANGELOG.md`](./CHANGELOG.md) and have no version yet. Anything breaking before 1.0 will increment the minor version when it is released.
 
 ## Acknowledgements
 

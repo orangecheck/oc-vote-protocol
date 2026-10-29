@@ -1,6 +1,6 @@
 # OC Vote Protocol v0 — Specification
 
-**Status:** Stable (v0)
+**Status:** v0, still changing. Rule changes since 0.1.0 are listed under [Unreleased] in [CHANGELOG.md](./CHANGELOG.md) and have no version yet.
 **Date:** 2026-04
 **Depends on:** OrangeCheck SPEC, OC Lock SPEC (for secret-ballot mode)
 
