@@ -120,7 +120,7 @@ event.pubkey     = ephemeral_nostr_pubkey    // per §3.5
 event.created_at = unix_seconds
 ```
 
-Clients SHOULD publish to at least three relays from a diverse set. The reference client uses `relay.ochk.io`, `nos.lol`, `relay.primal.net`, `relay.damus.io` and `nostr.oxtr.dev`, the default set in `@orangecheck/nostr-core`.
+Clients SHOULD publish to at least three relays from a diverse set. The reference client uses `relay.ochk.io`, `nos.lol`, `relay.primal.net`, `relay.damus.io` and `nostr.oxtr.dev`, the default set in `@orangecheck/nostr-core`. A client SHOULD keep publishing a poll, a ballot or a reveal until at least two of the relays talliers ask, each asked alone, serve back a copy that verifies, or every one of them does when talliers ask fewer than two (the write quorum the read floor in §6.5, Discovering the ballots, assumes), and SHOULD NOT report a ballot as counted, or a poll or a reveal as published, until then.
 
 ### 3.5 Nostr authorship
 
@@ -453,6 +453,18 @@ own signature (§8 step 1), since `ballot_id` leaves `sig.value` out (§4.2); a
 copy that fails is dropped and never replaces another relay's copy. Expect
 several ballots per voter: each is its own Nostr event (§4.5), and the §8
 tiebreak picks one.
+
+A tally rests on the ballots it read, and `awaiting_reveal` on a reveal it
+did not find. A tallier MAY treat its ballots as complete, or the reveal as
+absent, only when at least the read floor of the relays it asked answered in
+full, each read paged with `until` until a page came back shorter than the
+`limit` asked, and none was cut off. The read floor is the number asked, less
+the write quorum of 2 (§3.4), plus one, and never fewer than one: four of
+five. When the ballot read falls short of that, a clock-dated poll gets no
+count, only a report that the tallier could not read the poll, and an anchored
+poll's tally is at most provisional (§4.6), never final, and says the read fell
+short. When the reveal read falls short, the tallier reports that it could not
+read the poll, never `awaiting_reveal`.
 
 > **Errata (2026-09-02).** §3.4 / §3.6 / §6.3 previously specified only the
 > multi-letter `poll_id` / `voter` / `creator` tags. A `#poll_id` filter

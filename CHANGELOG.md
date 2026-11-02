@@ -4,6 +4,21 @@ All notable changes to the OC Vote protocol and reference SDK.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased] — 2026-11-02 — the write quorum and the read floor
+
+No canonicalization or signature change.
+
+- **§3.4.** A client keeps publishing a poll, a ballot or a reveal until at
+  least two of the relays talliers ask, each asked alone, serve back a copy
+  that verifies (every one, when they ask fewer than two), and reports a
+  ballot as counted, or a poll or reveal as published, only then.
+- **§6.5, Discovering the ballots.** A tallier treats its ballots as complete,
+  or the reveal as absent, only on a read the read floor of the relays asked
+  finished in full with none cut off: the number asked, less 2, plus 1, and
+  never fewer than one. Below it, a clock-dated poll gets no count, an
+  anchored poll's tally is at most provisional, never final, and says the read
+  fell short, and a reveal read below it never gives `awaiting_reveal`.
+
 ## [Unreleased] — 2026-11-02 — each event is verified before it is de-duplicated
 
 No canonicalization or signature change.
