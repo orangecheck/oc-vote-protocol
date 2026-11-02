@@ -4,6 +4,16 @@ All notable changes to the OC Vote protocol and reference SDK.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased] — 2026-11-02 — each event is verified before it is de-duplicated
+
+No canonicalization or signature change.
+
+- **§6.5.** A tallier verifies each event under NIP-01, and each ballot's own
+  signature, before it de-duplicates by `ballot_id` or merges what different
+  relays returned, and drops a copy that fails. `ballot_id` leaves `sig.value`
+  out, so a copy with a broken signature could otherwise displace the valid
+  ballot before §8 step 1 rejects it.
+
 ## [Unreleased] — anchored ballots (polls with a deadline on or after 2026-11-15T00:00:00Z)
 
 No canonicalization or signature change: polls, ballots and reveals keep their

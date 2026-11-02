@@ -446,8 +446,13 @@ Because `t` is a shared namespace on these events — poll id, family marker,
 and voter or creator address all use it — a tallier MUST confirm each matched
 event against its content and MUST NOT trust the tag alone: accept a ballot
 only if `content.poll_id` equals the poll being tallied, and de-duplicate by
-`ballot_id`. Expect several ballots per voter: each is its own Nostr event
-(§4.5), and the §8 tiebreak picks one.
+`ballot_id`. Before it de-duplicates or merges answers from different relays,
+a tallier MUST verify each event under NIP-01 (its `id` is the SHA-256 of its
+serialized fields, and its `sig` verifies for its `pubkey`) and each ballot's
+own signature (§8 step 1), since `ballot_id` leaves `sig.value` out (§4.2); a
+copy that fails is dropped and never replaces another relay's copy. Expect
+several ballots per voter: each is its own Nostr event (§4.5), and the §8
+tiebreak picks one.
 
 > **Errata (2026-09-02).** §3.4 / §3.6 / §6.3 previously specified only the
 > multi-letter `poll_id` / `voter` / `creator` tags. A `#poll_id` filter
