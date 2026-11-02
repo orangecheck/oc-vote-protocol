@@ -17,7 +17,8 @@ No canonicalization or signature change.
   finished in full with none cut off: the number asked, less 2, plus 1, and
   never fewer than one. Below it, a clock-dated poll gets no count, an
   anchored poll's tally is at most provisional, never final, and says the read
-  fell short, and a reveal read below it never gives `awaiting_reveal`.
+  fell short (a secret-mode anchored poll stays `awaiting_reveal`), and a
+  reveal read below it never gives `awaiting_reveal`.
 
 ## [Unreleased] — 2026-11-02 — each event is verified before it is de-duplicated
 

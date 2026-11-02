@@ -463,8 +463,9 @@ the write quorum of 2 (§3.4), plus one, and never fewer than one: four of
 five. When the ballot read falls short of that, a clock-dated poll gets no
 count, only a report that the tallier could not read the poll, and an anchored
 poll's tally is at most provisional (§4.6), never final, and says the read fell
-short. When the reveal read falls short, the tallier reports that it could not
-read the poll, never `awaiting_reveal`.
+short (a secret-mode anchored poll stays `awaiting_reveal`, §8). When the
+reveal read falls short, the tallier reports that it could not read the poll,
+never `awaiting_reveal`.
 
 > **Errata (2026-09-02).** §3.4 / §3.6 / §6.3 previously specified only the
 > multi-letter `poll_id` / `voter` / `creator` tags. A `#poll_id` filter
