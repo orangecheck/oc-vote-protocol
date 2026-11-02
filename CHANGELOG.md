@@ -13,6 +13,10 @@ No canonicalization or signature change.
   relays returned, and drops a copy that fails. `ballot_id` leaves `sig.value`
   out, so a copy with a broken signature could otherwise displace the valid
   ballot before §8 step 1 rejects it.
+- **§10 item 1.** A poll is rejected only when no copy of it verifies.
+  `poll_id` and `reveal_id` leave `sig.value` out as `ballot_id` does, so a
+  reader MUST consider each copy of a poll or a reveal and use one that
+  verifies, dropping a copy that fails.
 
 ## [Unreleased] — anchored ballots (polls with a deadline on or after 2026-11-15T00:00:00Z)
 

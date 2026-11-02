@@ -658,7 +658,7 @@ Two conforming implementations running the same tally on the same inputs MUST pr
 
 Normative compliance conditions for correctness:
 
-1. **Verify every signature.** A ballot whose `sig.value` fails BIP-322 verification against `voter` MUST be dropped. A poll whose `sig.value` fails verification against `creator` MUST be rejected.
+1. **Verify every signature.** A ballot whose `sig.value` fails BIP-322 verification against `voter` MUST be dropped. A poll MUST be rejected only when no copy of it verifies against `creator`: copies of a poll or a reveal can share an id while differing in `sig.value` (§3.2, §6.3), so a reader MUST consider each copy and use one that verifies, dropping a copy that fails.
 2. **Verify `ballot_id` before signing.** The signer MUST compute `ballot_id` from the canonical serialization and confirm byte-equality with the input to BIP-322 before producing `sig.value`.
 3. **Reject premature and mismatched reveals.** For an anchored poll (§4.6), a tallier MUST NOT accept a reveal until its chain tip is at least `H_close + G + 6`, and never while `H_close` is `none`. For a clock-dated poll, it MUST NOT accept one while its own clock reads before the poll's `deadline`. The reveal's `revealed_at` is the creator's statement and decides neither. A tallier MUST also reject a reveal whose `reveal_sk` is not the X25519 secret key for the poll's `reveal_pk` (SECURITY Scenario 13).
 4. **Reject polls past deadline.** Clients MUST NOT accept ballots for a poll whose `deadline` has passed at publication time.
