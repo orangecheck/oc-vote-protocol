@@ -695,6 +695,9 @@ Two conforming implementations running the same tally on the same inputs MUST pr
 | `E_REORG` | Snapshot block is not yet known or has fewer than 6 confirmations at tally time. The tally is deferred (§8). |
 | `E_UNSUPPORTED_MODE` | Client does not implement `poll.weight_mode`. |
 
+A counted voter whose coins could not be read is not an error: the tally's state
+is `unread` (§8), with a reason per voter, as `deferred` carries `E_REORG`.
+
 ## 10. Security-relevant requirements
 
 Normative compliance conditions for correctness:
