@@ -520,7 +520,7 @@ age_days(u, H) := max(0, floor((H - u.confirmed_height) * 600 / 86400))
 ## 8. Tally algorithm
 
 ```
-function tally(poll, ballots[], utxos_at: (addr, H) -> UTXOSet, reveal_sk: optional,
+function tally(poll, ballots[], utxos_at: (addr, H) -> UTXOSet | unread(reason), reveal_sk: optional,
                tip_height, close_height, anchor_height: (ballot_id) -> height | none):
   # reveal_sk comes from a reveal accepted under §10.3, else None.
   # close_height (H_close, none while unknown) and anchor_height are for an anchored poll only (§4.6).
@@ -580,16 +580,23 @@ function tally(poll, ballots[], utxos_at: (addr, H) -> UTXOSet, reveal_sk: optio
   # 5. Sum weights per option
   tallies = { o.id: 0 for o in poll.options }
   turnout = { "voters": 0, "weight": 0 }
+  unread = []
   for voter, b in per_voter:
     option = option_of[voter]
     if option == "withdraw": continue
     if option not in tallies: continue
     U = utxos_at(voter, H)
+    if U is unread:                      # the chain did not give the voter's coins
+      unread.append({ "voter": voter, "reason": U.reason })
+      continue
     w = weight_for_mode(poll.weight_mode, poll.weight_params, poll.min_sats, poll.min_days, U, H)
     if w == 0: continue
     tallies[option] += w
     turnout.voters += 1
     turnout.weight += w
+
+  if unread:                             # no count while a counted voter is unread
+    return head + { "state": "unread", "snapshot_block": H, "unread": sorted(unread, by voter) }
 
   result = head + {
     "state": final ? "tallied" : "provisional",
@@ -618,6 +625,27 @@ step 3, withdrawals and ballots that weigh zero included, as lowercase hex in
 ascending order.
 `unanchored`, in a provisional tally, is how many of those have no anchor at or
 below `H_close + G` yet (no anchor at all while `H_close` is `none`).
+
+A tally also rests on the coins it read. When `utxos_at` could not read a counted
+voter's coins at `H`, that voter is **unread**: never weighed zero, never
+counted, and never dropped. A tally with an unread voter has no count, as a
+ballot read that fell short has none (§6.5). Its state is `"unread"`, and it
+lists each unread voter once, in ascending order of `voter`, with one of these
+reasons:
+
+- `chain_unread`: no chain source answered (a rate limit, a server error, a
+  timeout). Tallying again later may succeed.
+- `utxo_cap_unread`: the source holds that the address has more unspent
+  outputs than it lists. Tallying again from the same source does not help,
+  and anyone can push an address there by sending it outputs, so a tallier
+  SHOULD read such an address from a source that lists it.
+- `provider_refused_unread`: the source refused the lookup.
+
+A coin set that was read and leaves the voter below `min_sats` or `min_days`
+weighs zero (`E_BELOW_THRESHOLD`), which is a reading, not an unread voter. A
+client MUST show an `"unread"` tally as one that could not be completed,
+never as a result or a partial count. A tallier MUST NOT keep an unread
+answer: the next tally reads the chain again.
 
 A tally covers the ballots its tallier found. A ballot found later counts in a
 later tally under the same rules. A client that shows an earlier tally SHOULD

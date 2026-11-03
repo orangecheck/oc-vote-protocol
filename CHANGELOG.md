@@ -39,6 +39,16 @@ No canonicalization or signature change.
 No canonicalization or signature change: polls, ballots and reveals keep their
 bytes and ids.
 
+- **§8, unread voters.** When a tally could not read a counted voter's coins at
+  the snapshot, that voter is unread: never weighed zero, never counted. A
+  tally with an unread voter has no count. Its new state `"unread"` lists each
+  such voter with a reason: `chain_unread`, `utxo_cap_unread` (the source lists
+  no more than about 500 outputs, and anyone can push an address past that by
+  sending it outputs) or `provider_refused_unread`. Before, one unreadable voter
+  ended the whole tally in the reference SDK with no word of whose coins.
+  `@orangecheck/vote-core` 2.2.0 implements it with `UtxoUnreadError` and
+  `UnreadResult`.
+
 - **§10 item 9.** A verifier of a ballot cast by an OC Agent takes `poll_id`
   and `choice` from the ballot (or its reveal), never from the agent action's
   `scope_exercised`, and refuses the ballot unless they meet the delegation's
