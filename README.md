@@ -31,15 +31,13 @@ The TypeScript reference implementation is published to **npm**, maintained in t
 
 | Package | Purpose |
 |---|---|
-| `@orangecheck/vote-core` | Canonicalization, `poll_id` / `ballot_id` computation, `tally()` pure function. |
-| `@orangecheck/vote-ballot` | Ballot creation, signing, secret-mode sealing. |
-| `@orangecheck/vote-cli` | `oc-vote create | sign | tally | verify | reveal`. |
+| `@orangecheck/vote-core` | Canonicalization, `poll_id` / `ballot_id` / `reveal_id` computation, secret-mode `commit()`, poll / ballot / reveal verification, `tally()` pure function. |
+| `@orangecheck/vote-cli` | `oc-vote create`, `vote`, `reveal`, `tally`, `verify`, `show`, `discover`, `gen-reveal-key`. |
+| `@orangecheck/vote-react` | React components that render live tallies as badges or poll cards. |
 
 ```
 npm i @orangecheck/vote-core
 ```
-
-(The packages are planned; the spec ships first.)
 
 ## Reference web client
 
@@ -105,7 +103,6 @@ That's the whole protocol. Everything else is encoding details. See [`WHY.md`](.
 │  vote.ochk.io             create UI, vote UI, tally UI          │
 ├─────────────────────────────────────────────────────────────────┤
 │  @orangecheck/vote-core         canonicalization, tally()       │
-│  @orangecheck/vote-ballot       sign, seal (secret mode)        │
 ├─────────────────────────────────────────────────────────────────┤
 │  @orangecheck/lock-core         envelope format for secret mode │
 │  @orangecheck/sdk               optional OC threshold hints     │
