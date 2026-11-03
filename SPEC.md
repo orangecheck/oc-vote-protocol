@@ -419,14 +419,10 @@ event.content = canonical_bytes(reveal_object)
 
 Given a secret-mode ballot and the reveal_sk, the tallier:
 
-1. Verifies the reveal (§10.3): its BIP-322 signature against the poll's `creator`, that `x25519_base(reveal_sk) == poll.reveal_pk`, and that the reveal is not premature. A reveal that fails any check is not a reveal, and the poll stays `awaiting reveal` (§6.5).
+1. Verifies the reveal (§10.3): its BIP-322 signature against the poll's `creator`, that `x25519_base(reveal_sk) == poll.reveal_pk`, and that the reveal is not premature. A reveal that fails any check is not a reveal, and the poll stays `awaiting reveal` (§6.6).
 2. Derives `device_sk = reveal_sk` and runs OC Lock §4.3 decryption on `ballot.secret.envelope` to recover the plaintext option id.
 3. Recomputes `commit` per §4.4 and compares to `ballot.secret.commit`. Rejects on mismatch (`E_COMMIT_MISMATCH`).
 4. Substitutes the decrypted option id into the ballot for tally purposes.
-
-### 6.5 Abandoned polls
-
-If no valid reveal event exists for a secret-mode poll at tally time, the poll is **abandoned**. Clients MUST display the state as "awaiting reveal" and MUST NOT produce a tally. Observers MAY still enumerate the ballots (§6.5), which proves participation even if the choices are opaque.
 
 ### 6.5 Discovering the ballots in a poll
 
@@ -477,6 +473,10 @@ never `awaiting_reveal`.
 > readability; a verifier MUST NOT depend on them. No migration is required:
 > a sweep of five relays on 2026-09-02 found zero kind-3008x events carrying
 > an `oc-vote:` `d`-tag prefix.
+
+### 6.6 Abandoned polls
+
+If no valid reveal event exists for a secret-mode poll at tally time, the poll is **abandoned**. Clients MUST display the state as "awaiting reveal" and MUST NOT produce a tally. Observers MAY still enumerate the ballots (§6.5), which proves participation even if the choices are opaque.
 
 ## 7. Canonicalization
 

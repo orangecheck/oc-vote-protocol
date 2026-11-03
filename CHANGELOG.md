@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 No canonicalization or signature change.
 
+- **§6.5, §6.6.** Two sections were numbered §6.5. "Discovering the ballots
+  in a poll" keeps §6.5, which every reference to §6.5 means. "Abandoned
+  polls" is now §6.6, after it, and §6.4's "stays `awaiting reveal`" points
+  there.
 - **§3.4.** A client keeps publishing a poll, a ballot or a reveal until at
   least two of the relays talliers ask, each asked alone, serve back a copy
   that verifies (every one, when they ask fewer than two), and reports a
