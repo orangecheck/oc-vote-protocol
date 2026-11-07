@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 No canonicalization or signature change.
 
+- **Reference relay set** (§3.4): names `nostr.mom` in place of `relay.damus.io`, as `@orangecheck/nostr-core` 0.8.2's default set does and the reference client now uses. Non-normative; nothing a client MUST do changes.
 - **§6.5, §6.6.** Two sections were numbered §6.5. "Discovering the ballots
   in a poll" keeps §6.5, which every reference to §6.5 means. "Abandoned
   polls" is now §6.6, after it, and §6.4's "stays `awaiting reveal`" points

@@ -120,7 +120,7 @@ event.pubkey     = ephemeral_nostr_pubkey    // per §3.5
 event.created_at = unix_seconds
 ```
 
-Clients SHOULD publish to at least three relays from a diverse set. The reference client uses `relay.ochk.io`, `nos.lol`, `relay.primal.net`, `relay.damus.io` and `nostr.oxtr.dev`, the default set in `@orangecheck/nostr-core`. A client SHOULD keep publishing a poll, a ballot or a reveal until at least two of the relays talliers ask, each asked alone, serve back a copy that verifies, or every one of them does when talliers ask fewer than two (the write quorum the read floor in §6.5, Discovering the ballots, assumes), and SHOULD NOT report a ballot as counted, or a poll or a reveal as published, until then.
+Clients SHOULD publish to at least three relays from a diverse set. The reference client uses `relay.ochk.io`, `nos.lol`, `relay.primal.net`, `nostr.mom` and `nostr.oxtr.dev`, the default set in `@orangecheck/nostr-core`. A client SHOULD keep publishing a poll, a ballot or a reveal until at least two of the relays talliers ask, each asked alone, serve back a copy that verifies, or every one of them does when talliers ask fewer than two (the write quorum the read floor in §6.5, Discovering the ballots, assumes), and SHOULD NOT report a ballot as counted, or a poll or a reveal as published, until then.
 
 ### 3.5 Nostr authorship
 
