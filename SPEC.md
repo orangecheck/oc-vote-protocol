@@ -115,10 +115,12 @@ event.tags       = [
   ["snapshot",   snapshot_block or "deadline"],
   ["mode",       "public" | "secret"]
 ]
-event.content    = canonical_bytes(poll)     // the entire poll object as canonical JSON
+event.content    = canonical_bytes(poll)     // the poll as JSON; SHOULD be these bytes (below)
 event.pubkey     = ephemeral_nostr_pubkey    // per §3.5
 event.created_at = unix_seconds
 ```
+
+`event.content` is the poll as JSON. A publisher SHOULD write `canonical_bytes(poll)` (§7), its final LF included. A reader MUST parse the content and recompute `poll_id` from the fields (§3.2), and MUST NOT hash the content bytes: a poll's content on a relay can differ from its canonical bytes in key order, whitespace or the final LF and still be the same poll. Ballot (§4.5) and reveal (§6.3) events follow the same rule.
 
 Clients SHOULD publish to at least three relays from a diverse set. The reference client uses `relay.ochk.io`, `nos.lol`, `relay.primal.net`, `nostr.mom` and `nostr.oxtr.dev`, the default set in `@orangecheck/nostr-core`. A client SHOULD keep publishing a poll, a ballot or a reveal until at least two of the relays talliers ask, each asked alone, serve back a copy that verifies, or every one of them does when talliers ask fewer than two (the write quorum the read floor in §6.5, Discovering the ballots, assumes), and SHOULD NOT report a ballot as counted, or a poll or a reveal as published, until then.
 
@@ -202,7 +204,7 @@ event.tags       = [
   ["voter",      voter],
   ["ballot_id",  ballot_id]
 ]
-event.content    = canonical_bytes(ballot)
+event.content    = canonical_bytes(ballot)   // the ballot as JSON; SHOULD be these bytes (§3.4)
 event.pubkey     = ephemeral_nostr_pubkey
 event.created_at = unix_seconds
 ```
@@ -412,7 +414,7 @@ event.tags    = [
   ["t",       "oc-vote-reveal"],
   ["poll_id", poll_id]
 ]
-event.content = canonical_bytes(reveal_object)
+event.content = canonical_bytes(reveal_object)   // the reveal as JSON; SHOULD be these bytes (§3.4)
 ```
 
 ### 6.4 Unsealing
@@ -664,10 +666,10 @@ inherited property of a map or object (for example `__proto__` or
 `constructor`).
 
 When a relay returns several kind-30080 or kind-30082 events for one `d`
-tag, the poll is an event whose content hashes to the requested `poll_id`
-and whose `sig` verifies (§10.1), and the reveal is one that satisfies §6.4
-and §10.3. Event recency is not a selection rule: anyone can publish under
-any `d` tag with any `created_at`.
+tag, the poll is an event whose parsed content recomputes to the requested
+`poll_id` (§3.2, §3.4) and whose `sig` verifies (§10.1), and the reveal is
+one that satisfies §6.4 and §10.3. Event recency is not a selection rule:
+anyone can publish under any `d` tag with any `created_at`.
 
 `choose_by_tiebreak(a, b, t, anchored)` orders a voter's ballots by the key
 `(anchor_height, instant(created_at), ballot_id)` in an anchored poll, and by

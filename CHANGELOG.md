@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 No canonicalization or signature change.
 
+- **§3.4, §4.5, §6.3, §8 event content.** An event's content is the poll,
+  ballot or reveal as JSON. A publisher SHOULD write the §7 canonical bytes,
+  final LF included; a reader MUST parse the content and recompute the id
+  from the fields, and MUST NOT hash the content bytes. Events already on
+  relays in another serialization stay conformant.
 - **§7.** Says what the final LF is for: `poll_id`, `ballot_id` and
   `reveal_id` hash the canonical bytes with it, and a signature covers it
   through the hex id it signs. v01 and v05 show it.
