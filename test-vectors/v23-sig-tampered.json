@@ -1,0 +1,105 @@
+{
+  "description": "v21 with one byte of the ballot's signature flipped: the poll verifies, the ballot MUST NOT (E_BAD_SIG) and is dropped from the tally",
+  "inputs": {
+    "poll": {
+      "v": 0,
+      "kind": "oc-vote/poll",
+      "creator": "bc1q0xcqpzrky6eff2g52qdye53xkk9jxkvrh6yhyw",
+      "question": "Do we ship?",
+      "options": [
+        {
+          "id": "yes",
+          "label": "Ship it"
+        },
+        {
+          "id": "no",
+          "label": "Hold"
+        }
+      ],
+      "deadline": "2026-05-08T00:00:00Z",
+      "snapshot_block": 900000,
+      "weight_mode": "sats",
+      "weight_params": null,
+      "min_sats": 100000,
+      "min_days": 30,
+      "mode": "public",
+      "reveal_pk": null,
+      "tiebreak": "latest",
+      "notes": null,
+      "created_at": "2026-04-22T12:00:00Z",
+      "sig": {
+        "alg": "bip322",
+        "pubkey": "bc1q0xcqpzrky6eff2g52qdye53xkk9jxkvrh6yhyw",
+        "value": "AkcwRAIgLqRlwapqbO0My4YKYZOZP/lqpL+FmR9Lx3nwh7JiljECICxIa3BlTtcBd+v7fCRAtdMc/cua8iBl4qDPClnEKOiAASEDG4TFVnsSZECZXT7VqroFZdceGDRgSBn/nBf16dXdB48="
+      }
+    },
+    "ballots": [
+      {
+        "v": 0,
+        "kind": "oc-vote/ballot",
+        "poll_id": "1daab4ebc6682b90470d6d42b1f0257535d25f113f6d5ce88850ad4189824cf7",
+        "voter": "bc1q0xcqpzrky6eff2g52qdye53xkk9jxkvrh6yhyw",
+        "option": "yes",
+        "attestation_id": null,
+        "secret": null,
+        "created_at": "2026-04-23T09:15:00Z",
+        "sig": {
+          "alg": "bip322",
+          "pubkey": "bc1q0xcqpzrky6eff2g52qdye53xkk9jxkvrh6yhyw",
+          "value": "AkcwRAIgCGh6fjHkzNrDD5l/SyEEMKrQlJm21UOMXsxLohomqMYCIAek5VaitPpcWxOK6W5pCKMw0tbP7NiHWQMosXDyRha/ASEDG4TFVnsSZECZXT7VqroFZdceGDRgSBn/nBf16dXdB48="
+        }
+      }
+    ]
+  },
+  "expected": {
+    "poll_id": "1daab4ebc6682b90470d6d42b1f0257535d25f113f6d5ce88850ad4189824cf7",
+    "poll_canonical": "{\"created_at\":\"2026-04-22T12:00:00Z\",\"creator\":\"bc1q0xcqpzrky6eff2g52qdye53xkk9jxkvrh6yhyw\",\"deadline\":\"2026-05-08T00:00:00Z\",\"kind\":\"oc-vote/poll\",\"min_days\":30,\"min_sats\":100000,\"mode\":\"public\",\"notes\":null,\"options\":[{\"id\":\"yes\",\"label\":\"Ship it\"},{\"id\":\"no\",\"label\":\"Hold\"}],\"question\":\"Do we ship?\",\"reveal_pk\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1q0xcqpzrky6eff2g52qdye53xkk9jxkvrh6yhyw\",\"value\":\"\"},\"snapshot_block\":900000,\"tiebreak\":\"latest\",\"v\":0,\"weight_mode\":\"sats\",\"weight_params\":null}\n",
+    "ballot_ids": [
+      "bfb711a93de48efebb00419b43205f1211c13a02d225befcdc9f9f2c06e7f131"
+    ],
+    "ballot_canonicals": [
+      "{\"attestation_id\":null,\"created_at\":\"2026-04-23T09:15:00Z\",\"kind\":\"oc-vote/ballot\",\"option\":\"yes\",\"poll_id\":\"1daab4ebc6682b90470d6d42b1f0257535d25f113f6d5ce88850ad4189824cf7\",\"secret\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1q0xcqpzrky6eff2g52qdye53xkk9jxkvrh6yhyw\",\"value\":\"\"},\"v\":0,\"voter\":\"bc1q0xcqpzrky6eff2g52qdye53xkk9jxkvrh6yhyw\"}\n"
+    ],
+    "tally_with_utxos": {
+      "utxo_snapshot": {
+        "bc1q0xcqpzrky6eff2g52qdye53xkk9jxkvrh6yhyw": [
+          {
+            "value": 250000,
+            "confirmed_height": 895000
+          }
+        ]
+      },
+      "expected_result": {
+        "state": "tallied",
+        "basis": "voter_clocks",
+        "snapshot_block": 900000,
+        "turnout": {
+          "voters": 0,
+          "weight": 0
+        },
+        "tallies": {
+          "yes": 0,
+          "no": 0
+        },
+        "counted": []
+      }
+    }
+  },
+  "signature_check": {
+    "address_type": "p2wpkh",
+    "format": "bip322-simple",
+    "poll": {
+      "signed_message": "1daab4ebc6682b90470d6d42b1f0257535d25f113f6d5ce88850ad4189824cf7",
+      "expected": {
+        "outcome": "ACCEPT"
+      }
+    },
+    "ballot": {
+      "signed_message": "bfb711a93de48efebb00419b43205f1211c13a02d225befcdc9f9f2c06e7f131",
+      "expected": {
+        "outcome": "REJECT",
+        "error_code": "E_BAD_SIG"
+      }
+    }
+  }
+}

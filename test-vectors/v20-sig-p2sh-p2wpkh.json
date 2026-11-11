@@ -1,0 +1,106 @@
+{
+  "description": "P2SH-P2WPKH, BIP-322 simple signatures: v01's poll and ballot, each signed over its hex id by one disclosed burn key; both MUST verify and the ballot counts",
+  "inputs": {
+    "poll": {
+      "v": 0,
+      "kind": "oc-vote/poll",
+      "creator": "38Sqvnn4PbsHHfarwki7bm2vSeYvuZDgpz",
+      "question": "Do we ship?",
+      "options": [
+        {
+          "id": "yes",
+          "label": "Ship it"
+        },
+        {
+          "id": "no",
+          "label": "Hold"
+        }
+      ],
+      "deadline": "2026-05-08T00:00:00Z",
+      "snapshot_block": 900000,
+      "weight_mode": "sats",
+      "weight_params": null,
+      "min_sats": 100000,
+      "min_days": 30,
+      "mode": "public",
+      "reveal_pk": null,
+      "tiebreak": "latest",
+      "notes": null,
+      "created_at": "2026-04-22T12:00:00Z",
+      "sig": {
+        "alg": "bip322",
+        "pubkey": "38Sqvnn4PbsHHfarwki7bm2vSeYvuZDgpz",
+        "value": "AkcwRAIgIXJeZz5SlCEIOa/45frc3HuemBQ7btlcQsEra2WJ59UCICF2rnuqLMft8MiLR24PCi+LaDrBOWzoYh8puv6k4oFdASEDRid5rUqtOVFGFHUacQhfLxDhx6WT5OAw77W4chzlWws="
+      }
+    },
+    "ballots": [
+      {
+        "v": 0,
+        "kind": "oc-vote/ballot",
+        "poll_id": "cbcdd22a534ba03412caf160cf3771bf975cccfe8df775a506ac7cfc1f89825f",
+        "voter": "38Sqvnn4PbsHHfarwki7bm2vSeYvuZDgpz",
+        "option": "yes",
+        "attestation_id": null,
+        "secret": null,
+        "created_at": "2026-04-23T09:15:00Z",
+        "sig": {
+          "alg": "bip322",
+          "pubkey": "38Sqvnn4PbsHHfarwki7bm2vSeYvuZDgpz",
+          "value": "AkgwRQIhAPcR4+vxldInMit55Sp0PGukehBsBPUQw6O7g5MftxppAiBEM0eGIV58q9NgoMy+qh/y7u97Q6CTwT1/cUl8NFtzvwEhA0Ynea1KrTlRRhR1GnEIXy8Q4celk+TgMO+1uHIc5VsL"
+        }
+      }
+    ]
+  },
+  "expected": {
+    "poll_id": "cbcdd22a534ba03412caf160cf3771bf975cccfe8df775a506ac7cfc1f89825f",
+    "poll_canonical": "{\"created_at\":\"2026-04-22T12:00:00Z\",\"creator\":\"38Sqvnn4PbsHHfarwki7bm2vSeYvuZDgpz\",\"deadline\":\"2026-05-08T00:00:00Z\",\"kind\":\"oc-vote/poll\",\"min_days\":30,\"min_sats\":100000,\"mode\":\"public\",\"notes\":null,\"options\":[{\"id\":\"yes\",\"label\":\"Ship it\"},{\"id\":\"no\",\"label\":\"Hold\"}],\"question\":\"Do we ship?\",\"reveal_pk\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"38Sqvnn4PbsHHfarwki7bm2vSeYvuZDgpz\",\"value\":\"\"},\"snapshot_block\":900000,\"tiebreak\":\"latest\",\"v\":0,\"weight_mode\":\"sats\",\"weight_params\":null}\n",
+    "ballot_ids": [
+      "09fce803f6a7580d33e3bfb942c2fe46769ba8fedd3e6d01c9bad6526482522d"
+    ],
+    "ballot_canonicals": [
+      "{\"attestation_id\":null,\"created_at\":\"2026-04-23T09:15:00Z\",\"kind\":\"oc-vote/ballot\",\"option\":\"yes\",\"poll_id\":\"cbcdd22a534ba03412caf160cf3771bf975cccfe8df775a506ac7cfc1f89825f\",\"secret\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"38Sqvnn4PbsHHfarwki7bm2vSeYvuZDgpz\",\"value\":\"\"},\"v\":0,\"voter\":\"38Sqvnn4PbsHHfarwki7bm2vSeYvuZDgpz\"}\n"
+    ],
+    "tally_with_utxos": {
+      "utxo_snapshot": {
+        "38Sqvnn4PbsHHfarwki7bm2vSeYvuZDgpz": [
+          {
+            "value": 250000,
+            "confirmed_height": 895000
+          }
+        ]
+      },
+      "expected_result": {
+        "state": "tallied",
+        "basis": "voter_clocks",
+        "snapshot_block": 900000,
+        "turnout": {
+          "voters": 1,
+          "weight": 250000
+        },
+        "tallies": {
+          "yes": 250000,
+          "no": 0
+        },
+        "counted": [
+          "09fce803f6a7580d33e3bfb942c2fe46769ba8fedd3e6d01c9bad6526482522d"
+        ]
+      }
+    }
+  },
+  "signature_check": {
+    "address_type": "p2sh_p2wpkh",
+    "format": "bip322-simple",
+    "poll": {
+      "signed_message": "cbcdd22a534ba03412caf160cf3771bf975cccfe8df775a506ac7cfc1f89825f",
+      "expected": {
+        "outcome": "ACCEPT"
+      }
+    },
+    "ballot": {
+      "signed_message": "09fce803f6a7580d33e3bfb942c2fe46769ba8fedd3e6d01c9bad6526482522d",
+      "expected": {
+        "outcome": "ACCEPT"
+      }
+    }
+  }
+}

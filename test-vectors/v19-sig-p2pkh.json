@@ -1,0 +1,106 @@
+{
+  "description": "P2PKH, legacy BIP-137 signatures: v01's poll and ballot, each signed over its hex id by one disclosed burn key; both MUST verify and the ballot counts",
+  "inputs": {
+    "poll": {
+      "v": 0,
+      "kind": "oc-vote/poll",
+      "creator": "16yH2E12NYA5pg1d4BB7wtXXnBTZ8Lws7L",
+      "question": "Do we ship?",
+      "options": [
+        {
+          "id": "yes",
+          "label": "Ship it"
+        },
+        {
+          "id": "no",
+          "label": "Hold"
+        }
+      ],
+      "deadline": "2026-05-08T00:00:00Z",
+      "snapshot_block": 900000,
+      "weight_mode": "sats",
+      "weight_params": null,
+      "min_sats": 100000,
+      "min_days": 30,
+      "mode": "public",
+      "reveal_pk": null,
+      "tiebreak": "latest",
+      "notes": null,
+      "created_at": "2026-04-22T12:00:00Z",
+      "sig": {
+        "alg": "bip322",
+        "pubkey": "16yH2E12NYA5pg1d4BB7wtXXnBTZ8Lws7L",
+        "value": "IIF6MvbbHsWo2FZGEwgoy/gXMopSBN/MJskiMRPyFbqOQArDKbPlB7vbq1VDD/m10f7xl+ygPN2EImGezDS/AVg="
+      }
+    },
+    "ballots": [
+      {
+        "v": 0,
+        "kind": "oc-vote/ballot",
+        "poll_id": "449ef050be6f320c9247e0532094ee850cbc5fbcdcae2124bf37a989c03d7ae9",
+        "voter": "16yH2E12NYA5pg1d4BB7wtXXnBTZ8Lws7L",
+        "option": "yes",
+        "attestation_id": null,
+        "secret": null,
+        "created_at": "2026-04-23T09:15:00Z",
+        "sig": {
+          "alg": "bip322",
+          "pubkey": "16yH2E12NYA5pg1d4BB7wtXXnBTZ8Lws7L",
+          "value": "IH1i4e9zSaszn/49oVQFnetruXlhGGe44etDJWSkgYp1T3CLWg1gkoKYEGx1QyDIygS58ZSJk0X9I8fghnxU12A="
+        }
+      }
+    ]
+  },
+  "expected": {
+    "poll_id": "449ef050be6f320c9247e0532094ee850cbc5fbcdcae2124bf37a989c03d7ae9",
+    "poll_canonical": "{\"created_at\":\"2026-04-22T12:00:00Z\",\"creator\":\"16yH2E12NYA5pg1d4BB7wtXXnBTZ8Lws7L\",\"deadline\":\"2026-05-08T00:00:00Z\",\"kind\":\"oc-vote/poll\",\"min_days\":30,\"min_sats\":100000,\"mode\":\"public\",\"notes\":null,\"options\":[{\"id\":\"yes\",\"label\":\"Ship it\"},{\"id\":\"no\",\"label\":\"Hold\"}],\"question\":\"Do we ship?\",\"reveal_pk\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"16yH2E12NYA5pg1d4BB7wtXXnBTZ8Lws7L\",\"value\":\"\"},\"snapshot_block\":900000,\"tiebreak\":\"latest\",\"v\":0,\"weight_mode\":\"sats\",\"weight_params\":null}\n",
+    "ballot_ids": [
+      "46a316845a3e80e8c1afbd4c112a7afb14f77a642d147a3cbc0df83f73589549"
+    ],
+    "ballot_canonicals": [
+      "{\"attestation_id\":null,\"created_at\":\"2026-04-23T09:15:00Z\",\"kind\":\"oc-vote/ballot\",\"option\":\"yes\",\"poll_id\":\"449ef050be6f320c9247e0532094ee850cbc5fbcdcae2124bf37a989c03d7ae9\",\"secret\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"16yH2E12NYA5pg1d4BB7wtXXnBTZ8Lws7L\",\"value\":\"\"},\"v\":0,\"voter\":\"16yH2E12NYA5pg1d4BB7wtXXnBTZ8Lws7L\"}\n"
+    ],
+    "tally_with_utxos": {
+      "utxo_snapshot": {
+        "16yH2E12NYA5pg1d4BB7wtXXnBTZ8Lws7L": [
+          {
+            "value": 250000,
+            "confirmed_height": 895000
+          }
+        ]
+      },
+      "expected_result": {
+        "state": "tallied",
+        "basis": "voter_clocks",
+        "snapshot_block": 900000,
+        "turnout": {
+          "voters": 1,
+          "weight": 250000
+        },
+        "tallies": {
+          "yes": 250000,
+          "no": 0
+        },
+        "counted": [
+          "46a316845a3e80e8c1afbd4c112a7afb14f77a642d147a3cbc0df83f73589549"
+        ]
+      }
+    }
+  },
+  "signature_check": {
+    "address_type": "p2pkh",
+    "format": "bip137",
+    "poll": {
+      "signed_message": "449ef050be6f320c9247e0532094ee850cbc5fbcdcae2124bf37a989c03d7ae9",
+      "expected": {
+        "outcome": "ACCEPT"
+      }
+    },
+    "ballot": {
+      "signed_message": "46a316845a3e80e8c1afbd4c112a7afb14f77a642d147a3cbc0df83f73589549",
+      "expected": {
+        "outcome": "ACCEPT"
+      }
+    }
+  }
+}

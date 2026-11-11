@@ -1,0 +1,106 @@
+{
+  "description": "P2TR key path, BIP-322 simple signatures: v01's poll and ballot, each signed over its hex id by one disclosed burn key; both MUST verify and the ballot counts",
+  "inputs": {
+    "poll": {
+      "v": 0,
+      "kind": "oc-vote/poll",
+      "creator": "bc1p5e6v9v2j5wp3y6c79gaqdqltq7jdv45fswnnm7exmmp2020mqepsmcx06p",
+      "question": "Do we ship?",
+      "options": [
+        {
+          "id": "yes",
+          "label": "Ship it"
+        },
+        {
+          "id": "no",
+          "label": "Hold"
+        }
+      ],
+      "deadline": "2026-05-08T00:00:00Z",
+      "snapshot_block": 900000,
+      "weight_mode": "sats",
+      "weight_params": null,
+      "min_sats": 100000,
+      "min_days": 30,
+      "mode": "public",
+      "reveal_pk": null,
+      "tiebreak": "latest",
+      "notes": null,
+      "created_at": "2026-04-22T12:00:00Z",
+      "sig": {
+        "alg": "bip322",
+        "pubkey": "bc1p5e6v9v2j5wp3y6c79gaqdqltq7jdv45fswnnm7exmmp2020mqepsmcx06p",
+        "value": "AUGQBzld0KDZJLSlZbvlB4EZ4+FD0Jox0UaNCV+5mE9E6cfbG6uu/htJdHSboiexDWxxYOPfqKrP0mAqlGBrfum/AQ=="
+      }
+    },
+    "ballots": [
+      {
+        "v": 0,
+        "kind": "oc-vote/ballot",
+        "poll_id": "330113872a4fdd5e612616a322961dc04b20d99439391482bb0319e64e3fc758",
+        "voter": "bc1p5e6v9v2j5wp3y6c79gaqdqltq7jdv45fswnnm7exmmp2020mqepsmcx06p",
+        "option": "yes",
+        "attestation_id": null,
+        "secret": null,
+        "created_at": "2026-04-23T09:15:00Z",
+        "sig": {
+          "alg": "bip322",
+          "pubkey": "bc1p5e6v9v2j5wp3y6c79gaqdqltq7jdv45fswnnm7exmmp2020mqepsmcx06p",
+          "value": "AUELlJ4PnGIMDsiW60b80M0H73yWUhcIKpxy4Hl3V+kcYKy6ros0CaX+n6Y5/TlbyzRspAzfaLoOcR8WpigwIzVTAQ=="
+        }
+      }
+    ]
+  },
+  "expected": {
+    "poll_id": "330113872a4fdd5e612616a322961dc04b20d99439391482bb0319e64e3fc758",
+    "poll_canonical": "{\"created_at\":\"2026-04-22T12:00:00Z\",\"creator\":\"bc1p5e6v9v2j5wp3y6c79gaqdqltq7jdv45fswnnm7exmmp2020mqepsmcx06p\",\"deadline\":\"2026-05-08T00:00:00Z\",\"kind\":\"oc-vote/poll\",\"min_days\":30,\"min_sats\":100000,\"mode\":\"public\",\"notes\":null,\"options\":[{\"id\":\"yes\",\"label\":\"Ship it\"},{\"id\":\"no\",\"label\":\"Hold\"}],\"question\":\"Do we ship?\",\"reveal_pk\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1p5e6v9v2j5wp3y6c79gaqdqltq7jdv45fswnnm7exmmp2020mqepsmcx06p\",\"value\":\"\"},\"snapshot_block\":900000,\"tiebreak\":\"latest\",\"v\":0,\"weight_mode\":\"sats\",\"weight_params\":null}\n",
+    "ballot_ids": [
+      "be02accf1720493c707c2a99b7b15ba30c19aebe967a06648933897dbd1c136c"
+    ],
+    "ballot_canonicals": [
+      "{\"attestation_id\":null,\"created_at\":\"2026-04-23T09:15:00Z\",\"kind\":\"oc-vote/ballot\",\"option\":\"yes\",\"poll_id\":\"330113872a4fdd5e612616a322961dc04b20d99439391482bb0319e64e3fc758\",\"secret\":null,\"sig\":{\"alg\":\"bip322\",\"pubkey\":\"bc1p5e6v9v2j5wp3y6c79gaqdqltq7jdv45fswnnm7exmmp2020mqepsmcx06p\",\"value\":\"\"},\"v\":0,\"voter\":\"bc1p5e6v9v2j5wp3y6c79gaqdqltq7jdv45fswnnm7exmmp2020mqepsmcx06p\"}\n"
+    ],
+    "tally_with_utxos": {
+      "utxo_snapshot": {
+        "bc1p5e6v9v2j5wp3y6c79gaqdqltq7jdv45fswnnm7exmmp2020mqepsmcx06p": [
+          {
+            "value": 250000,
+            "confirmed_height": 895000
+          }
+        ]
+      },
+      "expected_result": {
+        "state": "tallied",
+        "basis": "voter_clocks",
+        "snapshot_block": 900000,
+        "turnout": {
+          "voters": 1,
+          "weight": 250000
+        },
+        "tallies": {
+          "yes": 250000,
+          "no": 0
+        },
+        "counted": [
+          "be02accf1720493c707c2a99b7b15ba30c19aebe967a06648933897dbd1c136c"
+        ]
+      }
+    }
+  },
+  "signature_check": {
+    "address_type": "p2tr",
+    "format": "bip322-simple",
+    "poll": {
+      "signed_message": "330113872a4fdd5e612616a322961dc04b20d99439391482bb0319e64e3fc758",
+      "expected": {
+        "outcome": "ACCEPT"
+      }
+    },
+    "ballot": {
+      "signed_message": "be02accf1720493c707c2a99b7b15ba30c19aebe967a06648933897dbd1c136c",
+      "expected": {
+        "outcome": "ACCEPT"
+      }
+    }
+  }
+}

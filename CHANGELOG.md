@@ -4,6 +4,19 @@ All notable changes to the OC Vote protocol and reference SDK.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased] — 2026-11-11 — signature vectors
+
+No canonicalization or signature change.
+
+- **Signature vectors** v19–v23: v01's poll and ballot with one disclosed burn
+  key's address as creator and voter, each signed over its hex id, one key per
+  address type (P2PKH in BIP-137 form; P2SH-P2WPKH, P2WPKH and P2TR in BIP-322
+  simple form). Each poll and ballot MUST verify, and the ballot counts. v23 is
+  v21 with one byte of the ballot's signature flipped: the poll verifies, the
+  ballot MUST NOT (`E_BAD_SIG`) and is not counted. Each carries a
+  `signature_check` block; `test-vectors/generate-signatures.mjs` writes them.
+  Non-normative; nothing a client MUST do changes.
+
 ## [Unreleased] — 2026-11-02 — the write quorum and the read floor
 
 No canonicalization or signature change.
