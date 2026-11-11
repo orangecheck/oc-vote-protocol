@@ -489,6 +489,8 @@ The canonical byte representation is required for computing all `*_id` values an
 - Strings: `\uXXXX` escapes only for control characters (U+0000–U+001F), `"` (U+0022), and `\` (U+005C). All other codepoints literal.
 - Final byte is LF (`0x0a`).
 
+`poll_id`, `ballot_id` and `reveal_id` (§3.2, §4.2, §6.3) hash these bytes, the final LF included: each vector's `poll_canonical`, `ballot_canonicals` and `reveal_canonical` end in LF, and their SHA-256 is the id beside them (v01, v05). A signature signs the hex id (§8), so it covers the LF through the id.
+
 A poll, ballot or reveal nests at most 32 levels of objects and arrays, the object itself being level 1. One nested deeper is malformed: a verifier MUST reject it, a tally MUST NOT count it, and a client MUST NOT treat it as a voter's standing ballot (vectors v17, v18).
 
 Reference: [RFC 8785 JSON Canonicalization Scheme](https://www.rfc-editor.org/rfc/rfc8785) with the additional constraint on `options[]` order.

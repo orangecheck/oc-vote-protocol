@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 No canonicalization or signature change.
 
+- **§7.** Says what the final LF is for: `poll_id`, `ballot_id` and
+  `reveal_id` hash the canonical bytes with it, and a signature covers it
+  through the hex id it signs. v01 and v05 show it.
+- **generate-signatures.mjs** takes v23's and v24's base from v21 by file
+  name, not by its place in the list. The vectors it writes are unchanged.
 - **§3.3, SECURITY.** `creator`'s address list names P2SH-P2WPKH, which §4.3
   and §10.1 already take and v20 signs from, and says `@orangecheck/bip322`
   checks P2TR on the key path and not P2WSH. SECURITY's BIP-322 line names the

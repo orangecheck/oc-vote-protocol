@@ -198,11 +198,13 @@ for (const [file, type, format, what] of TYPES) {
     });
 }
 
+const v21 = out.find((o) => o.file === 'v21-sig-p2wpkh.json').body;
+
 // v23: v21 with the middle byte of the ballot's signature flipped; length and base64 shape unchanged.
 {
     const pair = structuredClone(signedPair('p2wpkh'));
-    pair.poll = structuredClone(out[2].body.inputs.poll);
-    pair.ballot = structuredClone(out[2].body.inputs.ballots[0]);
+    pair.poll = structuredClone(v21.inputs.poll);
+    pair.ballot = structuredClone(v21.inputs.ballots[0]);
     const bytes = Buffer.from(pair.ballot.sig.value, 'base64');
     bytes[Math.floor(bytes.length / 2)] ^= 0x01;
     pair.ballot.sig.value = bytes.toString('base64');
@@ -224,8 +226,8 @@ for (const [file, type, format, what] of TYPES) {
 // v24: v21 with the middle byte of the poll's signature flipped; length and base64 shape unchanged.
 {
     const pair = structuredClone(signedPair('p2wpkh'));
-    pair.poll = structuredClone(out[2].body.inputs.poll);
-    pair.ballot = structuredClone(out[2].body.inputs.ballots[0]);
+    pair.poll = structuredClone(v21.inputs.poll);
+    pair.ballot = structuredClone(v21.inputs.ballots[0]);
     const bytes = Buffer.from(pair.poll.sig.value, 'base64');
     bytes[Math.floor(bytes.length / 2)] ^= 0x01;
     pair.poll.sig.value = bytes.toString('base64');
