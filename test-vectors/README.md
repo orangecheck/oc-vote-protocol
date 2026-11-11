@@ -24,13 +24,14 @@ Each `.json` file is an independent vector:
     "commits":            { "<voter>": "<hex>", ... },// secret-mode only
     "tally_with_utxos": {
       "utxo_snapshot":    { "<addr>": [{ "value": <sats>, "confirmed_height": <int> }] },
-      "expected_result":  { "state": "tallied", "basis": "voter_clocks", "snapshot_block": <int>, "turnout": {...}, "tallies": {...}, "counted": [...] }
+      "expected_result":  { "state": "tallied", "basis": "voter_clocks", "snapshot_block": <int>, "turnout": {...}, "tallies": {...}, "counted": [...] },
+      "expected_error":   "E_BAD_SIG"                // v24 only, in place of expected_result: the tally refuses the poll
     }
   },
-  "signature_check": {                                   // v19–v23 only
+  "signature_check": {                                   // v19–v24 only
     "address_type": "p2pkh" | "p2sh_p2wpkh" | "p2wpkh" | "p2tr",
     "format":       "bip137" | "bip322-simple",
-    "poll":   { "signed_message": "<poll_id>",   "expected": { "outcome": "ACCEPT" } },
+    "poll":   { "signed_message": "<poll_id>",   "expected": { "outcome": "ACCEPT" } | { "outcome": "REJECT", "error_code": "E_BAD_SIG" } },
     "ballot": { "signed_message": "<ballot_id>", "expected": { "outcome": "ACCEPT" } | { "outcome": "REJECT", "error_code": "E_BAD_SIG" } }
   }
 }
@@ -42,10 +43,10 @@ Given the `inputs`, a compliant implementation MUST:
 
 1. Canonicalize each object (poll, ballot, reveal) per [`SPEC §7`](../SPEC.md#7-canonicalization). The bytes MUST equal the `*_canonical` strings.
 2. Compute each `*_id` as `SHA256(canonical_bytes_with_sig.value_emptied)` per §7.1 / §7.2 / §6.3.
-3. Run the tally function per [`SPEC §8`](../SPEC.md#8-tally-algorithm) against the provided `utxo_snapshot`. The output MUST equal `tally_with_utxos.expected_result` after canonical serialization.
+3. Run the tally function per [`SPEC §8`](../SPEC.md#8-tally-algorithm) against the provided `utxo_snapshot`. The output MUST equal `tally_with_utxos.expected_result` after canonical serialization. Where the vector gives `expected_error` instead (v24), the tally MUST refuse the poll with that code and give no result.
 4. In anchored-poll vectors (v08–v11, v13–v15), `inputs.chain` gives the chain tip and `H_close` (`close_height`, `null` while it is `none`) and `inputs.anchors` maps each anchored `ballot_id` to the anchor height a tallier would have verified (SPEC §4.6); a ballot not listed has no anchor. The tally MUST apply SPEC §8 with them, and `expected.reveal_accepted`, where present, is whether the reveal is accepted at that tip. A vector without `inputs.chain` has a snapshot block with at least 6 confirmations.
 5. In secret-mode vectors, additionally verify every `secret.commit` matches `SHA256("oc-vote/v0/commit\npoll_id: …\nvoter: …\noption: …\n")`, and that the reveal's `reveal_sk` is the X25519 secret key for the poll's `reveal_pk` (SPEC §10.3).
-6. For a vector with `signature_check`, verify the poll's and the ballot's `sig.value` with the real BIP-322 verifier over its `signed_message`, the hex id (SPEC §3.3, §4.1, §10 item 1): `ACCEPT` means the signature verifies, `REJECT` means verification fails with `error_code`. Run the tally with that verifier, not a stub: a refused ballot is dropped, as `expected_result` shows.
+6. For a vector with `signature_check`, verify the poll's and the ballot's `sig.value` with the real BIP-322 verifier over its `signed_message`, the hex id (SPEC §3.3, §4.1, §10 item 1): `ACCEPT` means the signature verifies, `REJECT` means verification fails with `error_code`. Run the tally with that verifier, not a stub: a refused ballot is dropped, as `expected_result` shows, and a refused poll is refused whole (SPEC §10.1), as `expected_error` shows.
 
 If any of these diverge, the implementation is non-conformant. Typical bugs:
 
@@ -60,7 +61,7 @@ If any of these diverge, the implementation is non-conformant. Typical bugs:
 ## Signatures
 
 - In v01–v18, `sig.value` is a placeholder for bookkeeping, not a signature. Those vectors test canonical bytes, ids and the tally; the canonicalization and id computation are independent of signature validity, and a tallier that runs them needs `verify_bip322` stubbed.
-- v19–v23 carry real signatures from disclosed burn keys (see "Signature vectors" below), and their tally runs with the real verifier. Two wallets signing the same id need not produce the same bytes: an ECDSA wallet may not use RFC 6979 nonces, and a BIP-340 (P2TR) signature takes fresh auxiliary randomness. The assertion is that a signature **verifies**, never that it equals a stored one.
+- v19–v24 carry real signatures from disclosed burn keys (see "Signature vectors" below), and their tally runs with the real verifier. Two wallets signing the same id need not produce the same bytes: an ECDSA wallet may not use RFC 6979 nonces, and a BIP-340 (P2TR) signature takes fresh auxiliary randomness. The assertion is that a signature **verifies**, never that it equals a stored one.
 
 ## Current vectors
 
@@ -89,14 +90,15 @@ If any of these diverge, the implementation is non-conformant. Typical bugs:
 | [`v21-sig-p2wpkh.json`](./v21-sig-p2wpkh.json) | The same, P2WPKH, BIP-322 simple form |
 | [`v22-sig-p2tr.json`](./v22-sig-p2tr.json) | The same, P2TR key path, BIP-322 simple form |
 | [`v23-sig-tampered.json`](./v23-sig-tampered.json) | v21 with one byte of the ballot's signature flipped: the poll verifies, the ballot MUST NOT (`E_BAD_SIG`) and is not counted |
+| [`v24-sig-poll-tampered.json`](./v24-sig-poll-tampered.json) | v21 with one byte of the poll's signature flipped: the ballot verifies, the poll MUST NOT (`E_BAD_SIG`), and the tally refuses the poll (SPEC §10.1) |
 
-### Signature vectors (v19–v23)
+### Signature vectors (v19–v24)
 
 These take v01's poll and ballot (the same question, options, deadline, snapshot and dates) and put one **disclosed burn key**'s address in both `creator` and `voter`. The private keys are published in `generate-signatures.mjs` and must never hold funds: anyone can spend what is sent to their addresses. They are the keys `oc-stamp-protocol`'s v10–v14 use; #1 and #2 are the ones `oc-attest-protocol`'s tv21 and tv22 use.
 
 | Key | Private key (hex) | Address type | Address | Vectors |
 |---|---|---|---|---|
-| #1 | `01` repeated 32 times | P2WPKH | `bc1q0xcqpzrky6eff2g52qdye53xkk9jxkvrh6yhyw` | v21, v23 |
+| #1 | `01` repeated 32 times | P2WPKH | `bc1q0xcqpzrky6eff2g52qdye53xkk9jxkvrh6yhyw` | v21, v23, v24 |
 | #2 | `02` repeated 32 times | P2TR, key path (BIP-86) | `bc1p5e6v9v2j5wp3y6c79gaqdqltq7jdv45fswnnm7exmmp2020mqepsmcx06p` | v22 |
 | #3 | `03` repeated 32 times | P2PKH | `16yH2E12NYA5pg1d4BB7wtXXnBTZ8Lws7L` | v19 |
 | #4 | `04` repeated 32 times | P2SH-P2WPKH | `38Sqvnn4PbsHHfarwki7bm2vSeYvuZDgpz` | v20 |
@@ -130,15 +132,16 @@ The wallet signs the hex id (SPEC §3.3, §4.1), so `signature_check.poll.signed
 | v21 | `1daab4eb…24cf7` | `bfb711a9…7f131` | — |
 | v22 | `33011387…fc758` | `be02accf…c136c` | — |
 | v23 | `1daab4eb…24cf7` | `bfb711a9…7f131` | — |
+| v24 | `1daab4eb…24cf7` | `bfb711a9…7f131` | — |
 
 (Ids in this table are truncated; the vector files have full 64-char hex.)
 
 ## Test harness
 
-The `@orangecheck/vote-core` suite in `oc-packages/vote-core/` loads this directory and asserts byte-equality per vector. For each vector with `signature_check` it verifies the poll and the ballot through the real `@orangecheck/bip322` verifier and tallies with it, and it checks the set covers all four address types plus a refused ballot. New implementations should add a similar test.
+The `@orangecheck/vote-core` suite in `oc-packages/vote-core/` loads this directory and asserts byte-equality per vector. For each vector with `signature_check` it verifies the poll and the ballot through the real `@orangecheck/bip322` verifier and tallies with it, and it checks the set covers all four address types plus a refused ballot; a refused poll (v24) must refuse the tally. New implementations should add a similar test.
 
 ## How these vectors were generated
 
 A one-shot Node script (RFC 8785 canonicalization + Node `crypto.createHash('sha256')`) produced the ids and canonical bytes. The script is not in this repo — it's used as a seeding tool. The reference TypeScript SDK in `oc-packages` is the canonical producer-verifier from here on.
 
-`node test-vectors/generate-signatures.mjs` writes v19–v23 again. It loads bip322-js 3, bitcoinjs-lib 6, ecpair 2 and @bitcoinerlab/secp256k1 from `oc-packages/wallet-adapter/node_modules` in a clone next to this repository, or from the directory in `OC_SIGNER_NODE_MODULES`. v19–v21 and v23 come out byte for byte the same; v22's P2TR signatures differ on each run and still verify.
+`node test-vectors/generate-signatures.mjs` writes v19–v24 again. It loads bip322-js 3, bitcoinjs-lib 6, ecpair 2 and @bitcoinerlab/secp256k1 from `oc-packages/wallet-adapter/node_modules` in a clone next to this repository, or from the directory in `OC_SIGNER_NODE_MODULES`. v19–v21, v23 and v24 come out byte for byte the same; v22's P2TR signatures differ on each run and still verify.

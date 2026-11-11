@@ -83,7 +83,7 @@ Equivalently: compute the canonical serialization with `sig.value` set to the em
 
 - `v` — MUST be `0` for v0 compliance.
 - `kind` — MUST be the literal string `oc-vote/poll`.
-- `creator` — MUST be a valid Bitcoin mainnet address (P2WPKH, P2TR, P2WSH, or P2PKH).
+- `creator` — MUST be a valid Bitcoin mainnet address (P2WPKH, P2SH-P2WPKH, P2TR, P2WSH, or P2PKH). `@orangecheck/bip322`, the verifier the reference packages use, checks P2TR on the key path only and does not check P2WSH, so a poll from a P2WSH creator does not verify there (§10.1).
 - `question` — REQUIRED.
 - `options` — MUST contain at least 2 entries. Option ids MUST be unique within the poll. Reserved option id: `"withdraw"` (see §4.3).
 - `deadline` — MUST be an `iso8601_utc` string (§0), strictly in the future at the time of publication.

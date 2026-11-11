@@ -8,6 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 No canonicalization or signature change.
 
+- **§3.3, SECURITY.** `creator`'s address list names P2SH-P2WPKH, which §4.3
+  and §10.1 already take and v20 signs from, and says `@orangecheck/bip322`
+  checks P2TR on the key path and not P2WSH. SECURITY's BIP-322 line names the
+  same types and the vectors that carry them.
+- **Signature vector v24**: v21 with one byte of the poll's signature flipped.
+  The ballot verifies, the poll MUST NOT (`E_BAD_SIG`), and the tally refuses
+  the poll (§10.1). Its `tally_with_utxos` gives `expected_error` in place of
+  `expected_result`. Non-normative.
 - **Signature vectors** v19–v23: v01's poll and ballot with one disclosed burn
   key's address as creator and voter, each signed over its hex id, one key per
   address type (P2PKH in BIP-137 form; P2SH-P2WPKH, P2WPKH and P2TR in BIP-322

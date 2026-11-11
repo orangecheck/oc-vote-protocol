@@ -40,7 +40,7 @@ This document covers the **OC Vote v0 protocol specification** in this repositor
 ### Assumptions the protocol makes
 
 - **Bitcoin's security model holds.** ECDSA / Schnorr over secp256k1 remains unforgeable at current parameter sizes. A deep reorg at the snapshot block would invalidate a tally; the protocol requires ≥ 6 confirmations before tallying.
-- **BIP-322 is implemented correctly** by both signing and verifying clients. Pin verifiers to versions known to handle P2WPKH, P2TR, P2WSH, and P2PKH.
+- **BIP-322 is implemented correctly** by both signing and verifying clients. Pin verifiers to versions known to handle P2WPKH, P2SH-P2WPKH, P2TR and P2PKH; test vectors v19–v22 carry one real signature for each. `@orangecheck/bip322`, the verifier the reference packages use, checks P2TR on the key path only and does not check P2WSH.
 - **Voters' wallets isolate signing keys.** BIP-322 exposes only a signed message, not the private key. A compromised wallet compromises the voter, not the tally.
 - **Randomness is strong.** `reveal_sk` is generated via `crypto.getRandomValues` / platform CSPRNG. Weak randomness on a secret-mode poll creator compromises the reveal key and, by extension, ballot secrecy.
 - **OpenTimestamps calendars and anchorers are trusted for liveness only.** They can delay or withhold an anchor, never backdate one. A voter's own client, vote.ochk.io's convenience anchorer, or anyone else can anchor a ballot (`SPEC.md` §4.6).

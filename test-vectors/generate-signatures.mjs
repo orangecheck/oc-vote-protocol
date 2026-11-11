@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Signature vector generator for OC Vote (v19-v23).
+ * Signature vector generator for OC Vote (v19-v24).
  *
  *   node test-vectors/generate-signatures.mjs
  *
@@ -8,7 +8,9 @@
  * burn key, so a second implementation can check its BIP-322 wiring against
  * real signatures: P2PKH (legacy BIP-137 form), P2SH-P2WPKH, P2WPKH and P2TR
  * (BIP-322 simple form). v23 is v21 with one byte of the ballot's signature
- * flipped: the poll still verifies, and the ballot MUST be dropped.
+ * flipped: the poll still verifies, and the ballot MUST be dropped. v24 is v21
+ * with one byte of the poll's signature flipped: the ballot still verifies,
+ * and the poll MUST be refused, so no tally is given.
  *
  * The private keys below are published and never to be used for funds.
  * Anyone can spend what is sent to their addresses. They are the keys
@@ -136,9 +138,23 @@ function signedPair(type) {
     return { address, poll, ballot, p, b };
 }
 
-function vector({ description, type, format, pair, ballotOutcome }) {
+function vector({ description, type, format, pair, ballotOutcome, pollOutcome = { outcome: 'ACCEPT' } }) {
     const { address, poll, ballot, p, b } = pair;
     const counted = ballotOutcome.outcome === 'ACCEPT';
+    // A refused poll is refused whole (SPEC §10.1): the tally names the error, not a result.
+    const result =
+        pollOutcome.outcome === 'ACCEPT'
+            ? {
+                  expected_result: {
+                      state: 'tallied',
+                      basis: 'voter_clocks',
+                      snapshot_block: 900000,
+                      turnout: counted ? { voters: 1, weight: 250000 } : { voters: 0, weight: 0 },
+                      tallies: { yes: counted ? 250000 : 0, no: 0 },
+                      counted: counted ? [b.id] : [],
+                  },
+              }
+            : { expected_error: pollOutcome.error_code };
     return {
         description,
         inputs: { poll, ballots: [ballot] },
@@ -149,20 +165,13 @@ function vector({ description, type, format, pair, ballotOutcome }) {
             ballot_canonicals: [b.canonical],
             tally_with_utxos: {
                 utxo_snapshot: { [address]: [{ value: 250000, confirmed_height: 895000 }] },
-                expected_result: {
-                    state: 'tallied',
-                    basis: 'voter_clocks',
-                    snapshot_block: 900000,
-                    turnout: counted ? { voters: 1, weight: 250000 } : { voters: 0, weight: 0 },
-                    tallies: { yes: counted ? 250000 : 0, no: 0 },
-                    counted: counted ? [b.id] : [],
-                },
+                ...result,
             },
         },
         signature_check: {
             address_type: type,
             format,
-            poll: { signed_message: p.id, expected: { outcome: 'ACCEPT' } },
+            poll: { signed_message: p.id, expected: pollOutcome },
             ballot: { signed_message: b.id, expected: ballotOutcome },
         },
     };
@@ -208,6 +217,30 @@ for (const [file, type, format, what] of TYPES) {
             format: 'bip322-simple',
             pair,
             ballotOutcome: { outcome: 'REJECT', error_code: 'E_BAD_SIG' },
+        }),
+    });
+}
+
+// v24: v21 with the middle byte of the poll's signature flipped; length and base64 shape unchanged.
+{
+    const pair = structuredClone(signedPair('p2wpkh'));
+    pair.poll = structuredClone(out[2].body.inputs.poll);
+    pair.ballot = structuredClone(out[2].body.inputs.ballots[0]);
+    const bytes = Buffer.from(pair.poll.sig.value, 'base64');
+    bytes[Math.floor(bytes.length / 2)] ^= 0x01;
+    pair.poll.sig.value = bytes.toString('base64');
+    if (bip322.Verifier.verifySignature(pair.address, pair.p.id, pair.poll.sig.value))
+        throw new Error('v24: the flipped signature still verifies');
+    out.push({
+        file: 'v24-sig-poll-tampered.json',
+        body: vector({
+            description:
+                "v21 with one byte of the poll's signature flipped: the ballot verifies, the poll MUST NOT (E_BAD_SIG), and the tally refuses the poll (SPEC §10.1)",
+            type: 'p2wpkh',
+            format: 'bip322-simple',
+            pair,
+            pollOutcome: { outcome: 'REJECT', error_code: 'E_BAD_SIG' },
+            ballotOutcome: { outcome: 'ACCEPT' },
         }),
     });
 }
